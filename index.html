@@ -1,0 +1,946 @@
+<!doctype html>
+<html lang="en-NG">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Venpadi</title>
+<meta name="description" content="Venpadi is the record book for Nigerian vendors: sales, spending, debtors and stock in one place, saved on your phone first and synced when there is network." />
+<meta name="theme-color" content="#540298" />
+<meta name="color-scheme" content="light" />
+<meta property="og:title" content="Venpadi, vendors padi" />
+<meta property="og:description" content="Sales, spending, debtors and stock in one place. Saves without network. Nothing ever deletes." />
+<meta property="og:type" content="website" />
+<meta property="og:image" content="assets/screens/home-revealed.jpg" />
+<link rel="icon" href="assets/app-icon.png" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,600;12..96,700;12..96,800&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+<link rel="preload" as="image" href="assets/screens/home-revealed.jpg" />
+<style>
+/* ---------- Tokens: lifted from frontend/src/design/venpadi/tokens.ts ---------- */
+:root {
+  --bg: #F9F9F9;
+  --card: #FFFFFF;
+  --hairline: #F0F0F0;
+  --ink: #001212;
+  --sub: #5C5961;
+  --ink-faint: rgba(0, 18, 18, 0.5);
+  --brand: #540298;
+  --brand-deep: #47087F;
+  --brand-dark: #440279;
+  --brand-grad-end: #6A28A0;
+  --purple-qa: #6B00B8;
+  --yellow: #EED751;
+  --yellow-badge: #E7D14F;
+  --yellow-deep: #D2BA31;
+  --green: #14AB3E;
+  --green-deep: #0D7747;
+  --green-tint: #E7F7EE;
+  --red: #E92429;
+  --orange: #F16619;
+  --orange-tint: #FDF1E7;
+  --tile-purple: #EEEEFA;
+  --note-purple: #EEE6F5;
+  --amber: #B87D0A;
+  --amber-text: #7A5205; /* amber ink on --amber-bg at 6.2:1; the token amber reads 3.1:1 on it */
+  --amber-bg: #FEF1CC;
+  --owing: #C0392B;
+  --owing-bg: #FEF2F2;
+  --ok: #218C54;
+  --ok-bg: #E5F5EB;
+  --wash-1: #EFE4F6;
+  --wash-2: #F6F0F6;
+  --wash-3: #FCFBF9;
+
+  --r-card: 14px;
+  --r-button: 16px;
+  --r-input: 12px;
+  --r-sheet: 40px;
+  --r-pill: 100px;
+
+  --display: "Bricolage Grotesque", "SF Pro Display", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --body: "Manrope", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+
+  --max: 1240px;
+  --gutter: clamp(16px, 4vw, 40px);
+  --nav-h: 72px;
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+html { scroll-behavior: auto; -webkit-text-size-adjust: 100%; }
+html, body { overflow-x: clip; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--body);
+  font-size: 17px;
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+img { display: block; max-width: 100%; }
+a { color: inherit; text-decoration: none; }
+button { font: inherit; color: inherit; }
+:focus-visible { outline: 3px solid var(--yellow); outline-offset: 3px; border-radius: 6px; }
+.sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+h1, h2, h3 { font-family: var(--display); letter-spacing: -0.02em; margin: 0; font-weight: 700; line-height: 1.02; text-wrap: balance; }
+p { margin: 0; }
+.container { width: min(var(--max), 100% - 2 * var(--gutter)); margin-inline: auto; }
+
+/* ---------- Grain + ambient ---------- */
+.grain {
+  position: fixed; inset: -50%; z-index: 60; pointer-events: none; opacity: 0.045;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='220' height='220'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+  mix-blend-mode: multiply;
+}
+
+/* ---------- Intro curtain ---------- */
+.intro {
+  position: fixed; inset: 0; z-index: 100; background: var(--brand);
+  display: grid; place-items: center; clip-path: inset(0 0 0 0);
+  animation: introOut 0.9s cubic-bezier(0.77, 0, 0.18, 1) 1.15s forwards;
+}
+.intro__mark { width: 72px; height: 70px; animation: markIn 0.8s cubic-bezier(0.2, 0.8, 0.2, 1) both; }
+@keyframes markIn { from { transform: scale(0.6) rotate(-12deg); opacity: 0; } to { transform: none; opacity: 1; } }
+@keyframes introOut { to { clip-path: inset(0 0 100% 0); visibility: hidden; } }
+
+/* ---------- Nav ---------- */
+.nav {
+  position: fixed; inset: 0 0 auto 0; z-index: 50; height: var(--nav-h);
+  display: flex; align-items: center;
+  transition: background-color .35s ease, box-shadow .35s ease, backdrop-filter .35s ease;
+}
+.nav.is-scrolled { background: rgba(249, 249, 249, 0.72); backdrop-filter: saturate(160%) blur(16px); -webkit-backdrop-filter: saturate(160%) blur(16px); box-shadow: 0 1px 0 rgba(0, 18, 18, 0.06); }
+.nav__inner { display: flex; align-items: center; justify-content: space-between; gap: 24px; }
+.brand { display: inline-flex; align-items: center; gap: 10px; font-family: var(--display); font-weight: 700; font-size: 22px; letter-spacing: -0.03em; }
+.brand img { width: 28px; height: 27px; }
+.nav__links { display: flex; gap: 6px; list-style: none; margin: 0; padding: 0; }
+.nav__links a { padding: 8px 14px; border-radius: var(--r-pill); font-weight: 600; font-size: 15px; color: var(--sub); transition: color .2s, background-color .2s; }
+.nav__links a:hover { color: var(--ink); background: rgba(84, 2, 152, 0.07); }
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 10px;
+  height: 56px; padding: 0 26px; border-radius: var(--r-button); border: 0; cursor: pointer;
+  font-weight: 700; font-size: 16px; letter-spacing: -0.01em; white-space: nowrap;
+  transition: transform .25s cubic-bezier(.2,.8,.2,1), box-shadow .25s, background-color .25s, color .25s;
+}
+.btn--primary { background: var(--brand); color: #fff; box-shadow: 0 10px 30px -10px rgba(84, 2, 152, 0.55); }
+.btn--primary:hover { transform: translateY(-2px); box-shadow: 0 18px 40px -12px rgba(84, 2, 152, 0.6); background: var(--brand-dark); }
+.btn--ghost { background: rgba(84, 2, 152, 0.06); color: var(--brand-dark); }
+.btn--ghost:hover { background: rgba(84, 2, 152, 0.11); transform: translateY(-2px); }
+.btn--yellow { background: var(--yellow); color: var(--ink); box-shadow: 0 12px 30px -12px rgba(238, 215, 81, 0.9); }
+.btn--yellow:hover { transform: translateY(-2px); background: #F3E06A; }
+.btn--sm { height: 44px; padding: 0 18px; font-size: 15px; border-radius: var(--r-pill); }
+.btn svg { width: 18px; height: 18px; }
+
+/* ---------- Hero + story stage ---------- */
+.stage {
+  position: relative; isolation: isolate;
+  background: linear-gradient(180deg, var(--wash-1) 0%, var(--wash-2) 28%, var(--wash-3) 60%, var(--bg) 100%);
+}
+.blobs { position: absolute; inset: 0; overflow: hidden; z-index: -1; pointer-events: none; }
+.blob { position: absolute; border-radius: 50%; filter: blur(90px); opacity: .75; will-change: transform; }
+.blob--purple { width: 56vw; height: 56vw; max-width: 760px; max-height: 760px; background: radial-gradient(circle at 40% 40%, rgba(106, 40, 160, 0.55), rgba(84, 2, 152, 0) 65%); top: -18vw; right: -12vw; animation: drift1 18s ease-in-out infinite alternate; }
+.blob--yellow { width: 40vw; height: 40vw; max-width: 560px; max-height: 560px; background: radial-gradient(circle, rgba(238, 215, 81, 0.6), rgba(238, 215, 81, 0) 65%); top: 38vh; left: -14vw; animation: drift2 22s ease-in-out infinite alternate; }
+.blob--pink { width: 34vw; height: 34vw; max-width: 480px; max-height: 480px; background: radial-gradient(circle, rgba(236, 49, 107, 0.28), rgba(236, 49, 107, 0) 65%); top: 62vh; right: 6vw; animation: drift3 26s ease-in-out infinite alternate; }
+@keyframes drift1 { to { transform: translate(-8vw, 10vh) scale(1.08); } }
+@keyframes drift2 { to { transform: translate(10vw, -8vh) scale(1.12); } }
+@keyframes drift3 { to { transform: translate(-6vw, -12vh) scale(0.94); } }
+.grid-lines {
+  position: absolute; inset: 0; z-index: -1; pointer-events: none; opacity: .5;
+  background-image: radial-gradient(rgba(0, 18, 18, 0.10) 1px, transparent 1.2px);
+  background-size: 28px 28px;
+  mask-image: linear-gradient(180deg, rgba(0,0,0,.9), rgba(0,0,0,0) 85vh);
+  -webkit-mask-image: linear-gradient(180deg, rgba(0,0,0,.9), rgba(0,0,0,0) 85vh);
+}
+
+.stage-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.04fr) minmax(0, 0.96fr);
+  grid-template-areas: "copy phone" "steps phone";
+  column-gap: clamp(16px, 4vw, 56px);
+}
+.hero-copy { grid-area: copy; min-height: 100svh; display: flex; flex-direction: column; justify-content: center; padding-top: calc(var(--nav-h) + 24px); padding-bottom: 48px; }
+.phone-col { grid-area: phone; position: relative; }
+.steps { grid-area: steps; padding-bottom: 10vh; }
+
+.eyebrow {
+  display: inline-flex; align-items: center; gap: 10px; width: max-content; max-width: 100%;
+  padding: 8px 14px 8px 10px; border-radius: var(--r-pill);
+  background: rgba(255, 255, 255, 0.7); border: 1px solid rgba(84, 2, 152, 0.14);
+  font-weight: 700; font-size: 12.5px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--brand-dark);
+  box-shadow: 0 6px 20px -12px rgba(84, 2, 152, 0.4);
+}
+.eyebrow img { width: 18px; height: 13px; border-radius: 2px; }
+.eyebrow__long { display: inline-flex; align-items: center; gap: 10px; }
+.eyebrow .dot { width: 4px; height: 4px; border-radius: 50%; background: var(--yellow-deep); }
+
+.h1 { margin-top: 26px; font-size: clamp(50px, 8.6vw, 112px); font-weight: 800; line-height: 0.94; letter-spacing: -0.045em; }
+.h1 .line { display: block; overflow: hidden; padding-bottom: 0.06em; margin-bottom: -0.06em; }
+.h1 .line > span { display: inline-block; will-change: transform; }
+.h1 .hl { position: relative; color: var(--brand); font-style: italic; font-weight: 700; padding-right: .06em; }
+.h1 .hl svg { position: absolute; left: -2%; right: -2%; bottom: -0.08em; width: 104%; height: 0.32em; overflow: visible; }
+.h1 .hl path { fill: none; stroke: var(--yellow); stroke-width: 9; stroke-linecap: round; stroke-dasharray: 1; stroke-dashoffset: 1; }
+
+.lede { margin-top: 28px; max-width: 54ch; font-size: clamp(17px, 1.35vw, 20px); color: var(--sub); line-height: 1.55; }
+.lede strong { color: var(--ink); font-weight: 700; }
+.cta-row { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 34px; }
+.facts { display: flex; flex-wrap: wrap; gap: 10px 26px; margin: 40px 0 0; padding: 0; list-style: none; }
+.facts li { display: flex; align-items: baseline; gap: 8px; font-size: 14.5px; color: var(--sub); font-weight: 600; }
+.facts b { font-family: var(--display); font-size: 26px; color: var(--ink); font-weight: 800; letter-spacing: -0.03em; line-height: 1; }
+
+/* ---------- Phone ---------- */
+.phone-sticky {
+  position: sticky; top: 0; height: 100svh;
+  display: grid; place-items: center;
+}
+.stage3d { perspective: 1900px; perspective-origin: 50% 45%; position: relative; }
+.float { animation: float 7s ease-in-out infinite; transform-style: preserve-3d; }
+@keyframes float { 0%, 100% { transform: translateY(-9px); } 50% { transform: translateY(9px); } }
+.rot, .tilt { transform-style: preserve-3d; }
+.phone {
+  position: relative;
+  height: min(700px, 76svh);
+  aspect-ratio: 390 / 844;
+  transform-style: preserve-3d;
+  filter: drop-shadow(0 50px 60px rgba(28, 0, 52, 0.35));
+}
+.phone__edge, .phone__body {
+  position: absolute; inset: 0; border-radius: 13.2% / 6.1%;
+}
+.phone__edge { background: #0c0c10; }
+.phone__edge:nth-child(1) { transform: translateZ(-2px); background: #1a1a20; }
+.phone__edge:nth-child(2) { transform: translateZ(-4px); background: #17171c; }
+.phone__edge:nth-child(3) { transform: translateZ(-6px); background: #141419; }
+.phone__edge:nth-child(4) { transform: translateZ(-8px); background: #111116; }
+.phone__edge:nth-child(5) { transform: translateZ(-10px); background: #0e0e12; box-shadow: 0 0 0 1px rgba(255,255,255,0.06); }
+.phone__body {
+  background:
+    linear-gradient(160deg, #3a3a44 0%, #1d1d24 30%, #101015 65%, #26262e 100%);
+  box-shadow:
+    inset 0 0 0 1.5px rgba(255, 255, 255, 0.22),
+    inset 0 0 0 5px #0d0d11,
+    inset 0 0 0 6px rgba(255,255,255,0.05);
+}
+.phone__screen {
+  position: absolute; inset: 2.1%; border-radius: 11.3% / 5.3%;
+  overflow: hidden; background: #000; transform: translateZ(1px);
+  isolation: isolate;
+}
+.phone__screen img {
+  position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: top;
+  opacity: 0; transform: translateY(14px) scale(1.03);
+  transition: opacity .55s cubic-bezier(.2,.8,.2,1), transform .7s cubic-bezier(.2,.8,.2,1);
+}
+.phone__screen img.is-active { opacity: 1; transform: none; z-index: 1; }
+.phone__island { position: absolute; top: 2.3%; left: 50%; width: 27%; height: 3.1%; transform: translate(-50%, 0) translateZ(2px); background: #000; border-radius: var(--r-pill); z-index: 3; }
+.phone__glare {
+  position: absolute; inset: 0; z-index: 2; pointer-events: none; border-radius: inherit;
+  background: linear-gradient(112deg, rgba(255,255,255,0) 38%, rgba(255,255,255,0.16) 47%, rgba(255,255,255,0.05) 52%, rgba(255,255,255,0) 60%);
+  background-size: 260% 100%; background-position: 120% 0;
+  animation: glare 7.5s ease-in-out infinite;
+}
+@keyframes glare { 0%, 55% { background-position: 120% 0; } 85%, 100% { background-position: -40% 0; } }
+.phone__btn { position: absolute; background: #2a2a32; border-radius: 2px; transform: translateZ(-5px); box-shadow: 0 0 0 1px rgba(255,255,255,0.08); }
+.phone__btn--mute { left: -0.9%; top: 15%; width: 1%; height: 3.4%; }
+.phone__btn--volu { left: -0.9%; top: 21%; width: 1%; height: 6.5%; }
+.phone__btn--vold { left: -0.9%; top: 29%; width: 1%; height: 6.5%; }
+.phone__btn--power { right: -0.9%; top: 23%; width: 1%; height: 10%; }
+
+/* Floating record chips */
+.chip {
+  position: absolute; z-index: 4;
+  display: flex; align-items: center; gap: 10px;
+  padding: 10px 14px 10px 10px; border-radius: var(--r-card);
+  background: rgba(255, 255, 255, 0.78); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
+  border: 1px solid rgba(255,255,255,0.9);
+  box-shadow: 0 20px 40px -18px rgba(28, 0, 52, 0.35), 0 1px 0 rgba(255,255,255,.6) inset;
+  font-size: 13.5px; font-weight: 600; color: var(--ink); white-space: nowrap;
+  will-change: transform;
+}
+.chip__ic { width: 34px; height: 34px; border-radius: var(--r-input); display: grid; place-items: center; flex: none; }
+.chip__ic img { width: 18px; height: 18px; }
+.chip small { display: block; font-size: 11.5px; color: var(--sub); font-weight: 600; margin-top: 1px; }
+.chip .amt { font-family: var(--display); font-weight: 800; font-size: 16px; letter-spacing: -0.02em; }
+.chip--sale { left: -8%; top: 14%; animation: chipFloat 6s ease-in-out infinite; }
+.chip--sale .chip__ic { background: var(--green-tint); }
+.chip--sale .amt { color: var(--green-deep); }
+.chip--saved { right: -6%; top: 36%; animation: chipFloat 7.5s ease-in-out -2s infinite; padding: 9px 14px; color: var(--ok); background: rgba(229, 245, 235, 0.85); }
+.chip--saved .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--ok); box-shadow: 0 0 0 4px rgba(33,140,84,.18); }
+.chip--low { left: -4%; bottom: 20%; animation: chipFloat 8s ease-in-out -4s infinite; }
+.chip--low .chip__ic { background: var(--amber-bg); }
+.chip--owes { right: -10%; bottom: 8%; animation: chipFloat 6.5s ease-in-out -1s infinite; }
+.chip--owes .chip__ic { background: var(--note-purple); }
+.chip--owes .amt { color: var(--owing); }
+@keyframes chipFloat { 0%, 100% { transform: translateY(-6px); } 50% { transform: translateY(8px); } }
+
+/* ---------- Steps ---------- */
+.step { min-height: 100svh; display: flex; flex-direction: column; justify-content: center; padding: 10vh 0; }
+.step__num { display: inline-flex; align-self: flex-start; align-items: center; gap: 12px; font-family: var(--display); font-weight: 700; font-size: 14px; letter-spacing: .14em; text-transform: uppercase; color: var(--brand-dark); }
+.step__num::before { content: ""; width: 28px; height: 2px; background: var(--yellow-deep); border-radius: 2px; }
+.step h3 { margin-top: 18px; font-size: clamp(34px, 4.2vw, 56px); font-weight: 800; letter-spacing: -0.035em; line-height: 1; }
+.step p { margin-top: 20px; max-width: 48ch; color: var(--sub); font-size: clamp(16px, 1.25vw, 19px); }
+.step__fact { display: inline-flex; align-self: flex-start; align-items: center; gap: 8px; margin-top: 26px; padding: 8px 14px; border-radius: var(--r-pill); background: var(--tile-purple); color: var(--brand-dark); font-weight: 700; font-size: 13.5px; }
+.step__fact::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: var(--brand); }
+.step--sales .step__fact { background: var(--green-tint); color: var(--green-deep); } .step--sales .step__fact::before { background: var(--green); }
+.step--debts .step__fact { background: var(--owing-bg); color: var(--owing); } .step--debts .step__fact::before { background: var(--owing); }
+.step--stock .step__fact { background: var(--amber-bg); color: var(--amber-text); } .step--stock .step__fact::before { background: var(--amber); }
+.step--spent .step__fact { background: var(--orange-tint); color: #B44A0C; } .step--spent .step__fact::before { background: var(--orange); }
+
+/* ---------- Marquee ---------- */
+.marquee { background: var(--ink); color: var(--yellow); overflow: hidden; padding: 18px 0; transform: rotate(-1.2deg) scale(1.03); margin: 8vh 0; }
+.marquee__track { display: flex; gap: 0; width: max-content; animation: marquee 38s linear infinite; }
+.marquee:hover .marquee__track { animation-play-state: paused; }
+.marquee__group { display: flex; align-items: center; gap: 34px; padding-right: 34px; font-family: var(--display); font-weight: 700; font-size: clamp(18px, 2.2vw, 26px); letter-spacing: -0.01em; white-space: nowrap; }
+.marquee__group span::after { content: "✦"; margin-left: 34px; color: rgba(238, 215, 81, 0.55); font-size: .8em; }
+@keyframes marquee { to { transform: translateX(-50%); } }
+
+/* ---------- Generic section ---------- */
+.section { padding: clamp(72px, 10vw, 140px) 0; }
+.section__head { max-width: 760px; }
+.kicker { display: inline-flex; align-items: center; gap: 10px; font-weight: 800; font-size: 13px; letter-spacing: .14em; text-transform: uppercase; color: var(--brand-dark); }
+.kicker::before { content: ""; width: 10px; height: 10px; border-radius: 3px; background: var(--yellow); transform: rotate(45deg); }
+.h2 { margin-top: 16px; font-size: clamp(36px, 5vw, 68px); font-weight: 800; letter-spacing: -0.04em; line-height: 0.98; }
+.sub { margin-top: 20px; color: var(--sub); font-size: clamp(16px, 1.3vw, 19px); max-width: 60ch; }
+
+/* ---------- Offline ---------- */
+.offline { position: relative; color: #fff; background: radial-gradient(120% 90% at 85% 10%, var(--brand-grad-end) 0%, var(--brand) 45%, var(--brand-deep) 100%); overflow: hidden; border-radius: var(--r-sheet); margin-inline: var(--gutter); }
+.offline .kicker { color: var(--yellow); } .offline .kicker::before { background: var(--yellow); }
+.offline .h2 { color: #fff; } .offline .h2 em { font-style: italic; color: var(--yellow); font-weight: 700; }
+.offline .sub { color: rgba(255,255,255,0.78); }
+.offline__grid { display: grid; grid-template-columns: 1.1fr 0.9fr; gap: clamp(32px, 5vw, 80px); align-items: center; }
+.offline__rings { position: absolute; right: -10%; top: -20%; width: 60vw; max-width: 820px; aspect-ratio: 1; pointer-events: none; opacity: .5; }
+.offline__rings circle { fill: none; stroke: rgba(255,255,255,0.12); stroke-width: 1; }
+.offline__rules { display: grid; gap: 12px; margin-top: 34px; }
+.rule { display: flex; align-items: flex-start; gap: 14px; padding: 16px 18px; border-radius: var(--r-card); background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.12); }
+.rule__ic { width: 38px; height: 38px; flex: none; border-radius: var(--r-input); display: grid; place-items: center; background: rgba(238, 215, 81, 0.16); color: var(--yellow); font-weight: 800; font-family: var(--display); }
+.rule b { display: block; font-weight: 800; }
+.rule span { color: rgba(255,255,255,0.75); font-size: 15px; }
+
+/* Offline demo card */
+.demo { position: relative; background: var(--bg); color: var(--ink); border-radius: var(--r-card); padding: 22px; box-shadow: 0 40px 80px -30px rgba(0,0,0,0.5); }
+.demo__bar { display: flex; align-items: center; justify-content: space-between; font-size: 13px; font-weight: 700; color: var(--sub); }
+.signal { display: inline-flex; align-items: flex-end; gap: 2.5px; height: 14px; }
+.signal i { width: 4px; background: var(--ink); border-radius: 1px; transform-origin: bottom; animation: bars 9s ease-in-out infinite; }
+.signal i:nth-child(1) { height: 5px; }
+.signal i:nth-child(2) { height: 8px; animation-name: bars2; }
+.signal i:nth-child(3) { height: 11px; animation-name: bars3; }
+.signal i:nth-child(4) { height: 14px; animation-name: bars4; }
+@keyframes bars  { 0%, 100% { opacity: 1; } 30%, 60% { opacity: .25; } }
+@keyframes bars2 { 0%, 100% { opacity: 1; } 28%, 62% { opacity: .25; } }
+@keyframes bars3 { 0%, 100% { opacity: 1; } 26%, 64% { opacity: .25; } }
+@keyframes bars4 { 0%, 100% { opacity: 1; } 24%, 66% { opacity: .25; } }
+.demo__status { font-weight: 700; }
+.demo__status::before { content: "Online"; color: var(--ok); animation: statusText 9s steps(1) infinite; }
+@keyframes statusText { 0%, 100% { content: "Online"; color: var(--ok); } 24%, 66% { content: "No network"; color: var(--amber-text); } }
+.demo__row { display: flex; align-items: center; gap: 14px; margin-top: 18px; padding: 16px; border-radius: var(--r-card); background: #fff; box-shadow: 0 1px 0 rgba(0,18,18,0.05); animation: rowIn 9s cubic-bezier(.2,.8,.2,1) infinite; }
+@keyframes rowIn { 0%, 30% { transform: translateY(16px); opacity: 0; } 38%, 100% { transform: none; opacity: 1; } }
+.demo__ic { width: 44px; height: 44px; border-radius: 50%; background: var(--green-tint); display: grid; place-items: center; }
+.demo__ic img { width: 18px; height: 18px; }
+.demo__row b { display: block; font-size: 17px; font-weight: 700; }
+.demo__row small { color: var(--sub); font-size: 13.5px; }
+.demo__amt { margin-left: auto; text-align: right; font-family: var(--display); font-weight: 800; color: var(--green-deep); font-size: 18px; }
+.demo__pill { margin-top: 14px; display: inline-flex; align-items: center; gap: 8px; padding: 8px 14px; border-radius: var(--r-pill); font-weight: 700; font-size: 13.5px; animation: pill 9s steps(1) infinite; }
+.demo__pill::before { content: ""; width: 8px; height: 8px; border-radius: 50%; background: currentColor; }
+.demo__pill::after { content: "Saved on device"; animation: pillText 9s steps(1) infinite; }
+@keyframes pill { 0%, 71% { background: var(--ok-bg); color: var(--ok); } 72%, 97% { background: var(--tile-purple); color: var(--brand-dark); } 98%, 100% { background: var(--ok-bg); color: var(--ok); } }
+@keyframes pillText { 0%, 71% { content: "Saved on device"; } 72%, 97% { content: "Synced to your account"; } 98%, 100% { content: "Saved on device"; } }
+.demo__note { margin-top: 18px; font-size: 13px; color: var(--sub); font-weight: 600; }
+
+/* ---------- Bento principles ---------- */
+.bento { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; margin-top: 56px; }
+.tile {
+  position: relative; overflow: hidden; padding: 28px; min-height: 250px;
+  border-radius: var(--r-card); background: var(--card); border: 1px solid rgba(0, 18, 18, 0.06);
+  box-shadow: 0 1px 0 rgba(255,255,255,.8) inset, 0 20px 50px -40px rgba(28, 0, 52, 0.35);
+  display: flex; flex-direction: column; justify-content: flex-end; gap: 10px;
+  transition: transform .4s cubic-bezier(.2,.8,.2,1), box-shadow .4s;
+}
+.tile::before { content: ""; position: absolute; inset: 0; opacity: 0; transition: opacity .4s; background: radial-gradient(360px circle at var(--mx, 50%) var(--my, 50%), rgba(238, 215, 81, 0.28), transparent 45%); pointer-events: none; }
+.tile:hover { transform: translateY(-4px); box-shadow: 0 30px 60px -36px rgba(28, 0, 52, 0.45); }
+.tile:hover::before { opacity: 1; }
+.tile__ic { width: 52px; height: 52px; border-radius: var(--r-button); display: grid; place-items: center; background: var(--tile-purple); margin-bottom: auto; font-family: var(--display); font-weight: 800; font-size: 22px; color: var(--brand); }
+.tile__ic img { width: 24px; height: 24px; }
+.tile h3 { font-size: 24px; letter-spacing: -0.03em; font-weight: 800; }
+.tile p { color: var(--sub); font-size: 15.5px; }
+.tile--wide { grid-column: span 2; background: linear-gradient(135deg, #fff 0%, var(--tile-purple) 100%); }
+.tile--ink { background: var(--ink); color: #fff; border-color: transparent; }
+.tile--ink p { color: rgba(255,255,255,0.72); }
+.tile--ink .tile__ic { background: rgba(238, 215, 81, 0.16); color: var(--yellow); }
+.tile--ink::before { background: radial-gradient(360px circle at var(--mx, 50%) var(--my, 50%), rgba(106, 40, 160, 0.6), transparent 45%); }
+
+/* ---------- Health ---------- */
+.health__grid { display: grid; grid-template-columns: 1fr 1fr; gap: clamp(32px, 6vw, 96px); align-items: center; }
+.ring-wrap { position: relative; display: grid; place-items: center; }
+.ring { width: min(100%, 420px); aspect-ratio: 1; }
+.ring circle { fill: none; stroke-width: 22; stroke-linecap: butt; transform: rotate(-90deg); transform-box: view-box; transform-origin: 50% 50%; }
+.ring .track { stroke: #ECECEC; }
+.ring .arc { stroke-dasharray: 0 1000; transition: stroke-dasharray 1.4s cubic-bezier(.2,.8,.2,1); }
+.ring__center { position: absolute; text-align: center; }
+.ring__center b { display: block; font-family: var(--display); font-size: clamp(44px, 5vw, 64px); font-weight: 800; letter-spacing: -0.04em; line-height: 1; }
+.ring__center span { font-size: 14px; font-weight: 700; color: var(--sub); letter-spacing: .08em; text-transform: uppercase; }
+.legend { list-style: none; margin: 32px 0 0; padding: 0; display: grid; gap: 10px; }
+.legend li { display: flex; align-items: center; gap: 12px; padding: 14px 16px; border-radius: var(--r-card); background: #fff; border: 1px solid rgba(0,18,18,0.06); font-weight: 600; }
+.legend i { width: 12px; height: 12px; border-radius: 4px; flex: none; }
+.legend b { margin-left: auto; font-family: var(--display); font-weight: 800; font-size: 18px; letter-spacing: -0.02em; }
+.bands { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 22px; }
+.band { padding: 8px 14px; border-radius: var(--r-pill); font-weight: 700; font-size: 13.5px; }
+.band--b { background: var(--amber-bg); color: var(--amber-text); }
+.band--d { background: var(--tile-purple); color: var(--brand-dark); }
+.band--s { background: var(--ok-bg); color: var(--ok); }
+
+/* ---------- Who ---------- */
+.who { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; margin-top: 56px; }
+/* The illustrations are exported on a flat #540298 background, so the card is
+   that exact purple and the image sits flush against the bottom-right. */
+.persona {
+  position: relative; overflow: hidden; min-height: 440px; border-radius: var(--r-card); padding: 28px;
+  color: #fff; background: var(--brand);
+  display: flex; flex-direction: column; box-shadow: 0 30px 60px -40px rgba(28, 0, 52, 0.6);
+  transition: transform .45s cubic-bezier(.2,.8,.2,1);
+}
+.persona:hover { transform: translateY(-6px); }
+.persona__badge { display: inline-flex; align-self: flex-start; max-width: 100%; padding: 7px 12px; border-radius: var(--r-pill); background: rgba(238, 215, 81, 0.18); color: var(--yellow); font-weight: 800; font-size: 11.5px; letter-spacing: .1em; text-transform: uppercase; line-height: 1.3; }
+.persona h3 { margin-top: 16px; font-size: clamp(24px, 2.1vw, 30px); line-height: 1.04; letter-spacing: -0.03em; max-width: 13ch; }
+.persona__copy { position: relative; z-index: 1; width: 100%; }
+.persona img { position: absolute; right: 0; bottom: 0; width: 56%; max-width: 320px; height: auto; }
+.persona--landscape img { width: 94%; max-width: none; right: 3%; }
+.persona__fade { position: absolute; inset: 0; pointer-events: none; background: linear-gradient(90deg, var(--brand) 38%, rgba(84, 2, 152, 0) 60%); }
+
+/* ---------- Online shop teaser ---------- */
+.shop { background: var(--bg); }
+.shop .h2 em { font-style: italic; font-weight: 700; color: var(--brand); }
+.shop__grid { display: grid; grid-template-columns: 1.05fr 0.95fr; gap: clamp(32px, 6vw, 96px); align-items: center; }
+.shop__list { list-style: none; margin: 30px 0 0; padding: 0; display: grid; gap: 10px; }
+.shop__list li { display: flex; gap: 14px; align-items: flex-start; padding: 16px 18px; border-radius: var(--r-card); background: #fff; border: 1px dashed rgba(84, 2, 152, 0.28); }
+.shop__ic { width: 38px; height: 38px; flex: none; border-radius: var(--r-input); background: var(--tile-purple); display: grid; place-items: center; }
+.shop__ic img { width: 20px; height: 20px; }
+.shop__list b { display: block; font-weight: 800; }
+.shop__list span { color: var(--sub); font-size: 15px; }
+.shop__note { margin-top: 22px; padding: 12px 16px; border-radius: var(--r-card); background: var(--amber-bg); color: var(--amber-text); font-weight: 700; font-size: 14.5px; }
+.shop__art { position: relative; display: grid; place-items: center; padding: 24px 0; }
+.shop__card {
+  width: min(100%, 380px); border-radius: var(--r-card); background: #fff; padding: 20px;
+  border: 1.5px dashed rgba(84, 2, 152, 0.4);
+  box-shadow: 0 30px 60px -40px rgba(28, 0, 52, 0.4);
+  transform: rotate(-2deg);
+}
+.shop__card-top { display: flex; align-items: center; gap: 10px; font-weight: 800; font-size: 15px; }
+.shop__card-top i { margin-left: auto; font-style: normal; font-size: 11px; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; padding: 5px 9px; border-radius: var(--r-pill); background: var(--tile-purple); color: var(--brand-dark); }
+.shop__placeholder { margin-top: 16px; min-height: 220px; border-radius: var(--r-card); background: var(--bg); display: grid; place-content: center; justify-items: center; gap: 6px; text-align: center; padding: 24px; }
+.shop__placeholder img { width: 40px; height: 40px; margin-bottom: 8px; opacity: .9; }
+.shop__placeholder b { font-family: var(--display); font-weight: 800; font-size: 20px; letter-spacing: -0.02em; }
+.shop__placeholder span { color: var(--sub); font-size: 14px; font-weight: 600; }
+.shop__stamp { position: absolute; left: 0; top: 2%; transform: rotate(-6deg); padding: 10px 16px; border-radius: var(--r-pill); background: var(--yellow); color: var(--ink); font-family: var(--display); font-weight: 800; font-size: 14px; letter-spacing: -0.01em; box-shadow: 0 12px 30px -14px rgba(0,0,0,.4); }
+
+/* ---------- FAQ ---------- */
+.faq { max-width: 820px; margin: 48px auto 0; display: grid; gap: 10px; }
+.faq details { border-radius: var(--r-card); background: #fff; border: 1px solid rgba(0,18,18,0.07); overflow: hidden; }
+.faq summary { list-style: none; cursor: pointer; display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 22px 24px; font-family: var(--display); font-weight: 700; font-size: 20px; letter-spacing: -0.02em; }
+.faq summary::-webkit-details-marker { display: none; }
+.faq summary::after { content: "+"; flex: none; width: 36px; height: 36px; border-radius: 50%; display: grid; place-items: center; background: var(--tile-purple); color: var(--brand); font-size: 22px; font-weight: 500; transition: transform .35s cubic-bezier(.2,.8,.2,1), background-color .3s; }
+.faq details[open] summary::after { transform: rotate(45deg); background: var(--yellow); color: var(--ink); }
+.faq details p { padding: 0 24px 24px; color: var(--sub); font-size: 16.5px; max-width: 66ch; }
+
+/* ---------- Final CTA + footer ---------- */
+.final { margin-inline: var(--gutter); position: relative; overflow: hidden; border-radius: var(--r-sheet); background: var(--ink); color: #fff; padding: clamp(56px, 8vw, 110px) clamp(24px, 6vw, 96px); min-height: 520px; display: grid; grid-template-columns: 1.1fr .9fr; align-items: center; }
+.final .h2 { color: #fff; } .final .h2 em { font-style: italic; color: var(--yellow); font-weight: 700; }
+.final .sub { color: rgba(255,255,255,0.72); }
+.final__blob { position: absolute; width: 60%; aspect-ratio: 1; border-radius: 50%; left: -20%; top: -40%; background: radial-gradient(circle, rgba(106, 40, 160, 0.9), transparent 65%); filter: blur(60px); pointer-events: none; }
+.final__blob--y { left: auto; right: -10%; top: auto; bottom: -50%; width: 45%; background: radial-gradient(circle, rgba(238, 215, 81, 0.55), transparent 65%); }
+.final__phone { position: absolute; right: 6%; bottom: -24%; width: min(300px, 34%); aspect-ratio: 390/844; border-radius: 13.2% / 6.1%; background: #111; padding: 2.1%; transform: rotate(-8deg); box-shadow: 0 0 0 1.5px rgba(255,255,255,.22) inset, 0 60px 80px -30px rgba(0,0,0,.8); }
+.final__phone img { width: 100%; height: 100%; object-fit: cover; object-position: top; border-radius: 11.3% / 5.3%; }
+.footer { padding: 48px 0 40px; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 16px; color: var(--sub); font-size: 14.5px; }
+.footer__links { display: flex; flex-wrap: wrap; gap: 18px; list-style: none; margin: 0; padding: 0; font-weight: 600; }
+.footer__links a:hover { color: var(--ink); }
+
+/* ---------- Responsive ---------- */
+@media (max-width: 1000px) {
+  .bento { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .tile--wide { grid-column: span 2; }
+  .who { grid-template-columns: 1fr; }
+  .persona { min-height: 380px; }
+  .health__grid, .offline__grid, .shop__grid { grid-template-columns: 1fr; }
+  .final { grid-template-columns: 1fr; min-height: 0; padding-bottom: 60vw; }
+  .final__phone { width: min(260px, 52%); right: 8%; bottom: -30%; }
+}
+@media (max-width: 900px) {
+  .nav__links { display: none; }
+  .stage-grid { grid-template-columns: minmax(0, 1fr); grid-template-rows: auto 52svh auto; grid-template-areas: none; column-gap: 0; }
+  .hero-copy { grid-area: auto; grid-row: 1; grid-column: 1; min-width: 0; min-height: 0; padding-top: calc(var(--nav-h) + 28px); padding-bottom: 20px; }
+  .phone-col { grid-area: auto; grid-row: 2 / span 2; grid-column: 1; z-index: 2; }
+  .steps { grid-area: auto; grid-row: 3; grid-column: 1; min-width: 0; }
+  .phone-sticky { top: var(--nav-h); height: 46svh; background: linear-gradient(180deg, var(--bg) 0%, var(--bg) 90%, rgba(249,249,249,0) 100%); }
+  .phone { height: 40svh; filter: drop-shadow(0 24px 30px rgba(28, 0, 52, 0.32)); }
+  .eyebrow__long { display: none; }
+  .chip { font-size: 12px; padding: 8px 10px 8px 8px; }
+  .chip__ic { width: 28px; height: 28px; }
+  .chip--sale { left: 2%; top: 4%; } .chip--saved { right: 2%; top: 30%; } .chip--low { left: 2%; bottom: 10%; } .chip--owes { display: none; }
+  .step { min-height: 0; padding: 12vh 0 6vh; }
+  .step:first-child { padding-top: 6vh; }
+  .marquee { margin: 4vh 0; }
+  .offline, .final { margin-inline: 12px; }
+  .h1 { font-size: clamp(46px, 13vw, 72px); }
+}
+@media (max-width: 600px) {
+  .bento { grid-template-columns: 1fr; }
+  .tile--wide { grid-column: auto; }
+  .tile { min-height: 200px; }
+  .cta-row .btn { width: 100%; }
+  .facts { gap: 10px 18px; }
+  /* Narrow cards: copy on top, illustration in flow below it, no overlap. */
+  .persona { min-height: 0; padding-bottom: 0; }
+  .persona__copy { order: -1; }
+  .persona img { position: static; width: 74%; max-width: none; margin: 20px 0 0 auto; }
+  .persona__fade { display: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .intro { animation-delay: 0s; animation-duration: .01s; }
+  .intro__mark, .float, .chip, .blob, .phone__glare, .marquee__track, .signal i, .demo__row, .demo__pill, .demo__pill::after, .demo__status::before { animation: none !important; }
+  .phone__screen img, .tile, .persona, .btn, .faq summary::after { transition: none !important; }
+  html { scroll-behavior: smooth; }
+}
+</style>
+</head>
+<body>
+<div class="grain" aria-hidden="true"></div>
+<div class="intro" aria-hidden="true"><img class="intro__mark" src="assets/figma/logo-mark.svg" alt="" width="72" height="70" /></div>
+
+<header class="nav" id="nav">
+  <div class="container nav__inner">
+    <a class="brand" href="#top" aria-label="Venpadi home"><img src="assets/figma/logo-mark-sm.svg" alt="" width="28" height="27" />Venpadi</a>
+    <nav aria-label="Sections">
+      <ul class="nav__links">
+        <li><a href="#records">Records</a></li>
+        <li><a href="#offline">Offline</a></li>
+        <li><a href="#rules">Rules</a></li>
+        <li><a href="#health">Business Health</a></li>
+        <li><a href="#shop">Online shop</a></li>
+        <li><a href="#faq">FAQ</a></li>
+      </ul>
+    </nav>
+    <a class="btn btn--primary btn--sm" href="/signup">Get started</a>
+  </div>
+</header>
+
+<main id="top">
+  <!-- ===================== HERO + SCROLL STORY ===================== -->
+  <section class="stage" aria-labelledby="hero-title">
+    <div class="blobs" aria-hidden="true"><div class="blob blob--purple"></div><div class="blob blob--yellow"></div><div class="blob blob--pink"></div></div>
+    <div class="grid-lines" aria-hidden="true"></div>
+
+    <div class="container stage-grid">
+      <div class="hero-copy">
+        <p class="eyebrow"><img src="assets/figma/flag-ng.svg" alt="" width="18" height="13" />Vendors padi<span class="eyebrow__long"><i class="dot"></i>Sales · Spending · Debtors · Stock</span></p>
+        <h1 class="h1" id="hero-title">
+          <span class="line"><span>Every sale.</span></span>
+          <span class="line"><span>Every debt.</span></span>
+          <span class="line"><span class="hl">On record.<svg viewBox="0 0 200 20" aria-hidden="true" preserveAspectRatio="none"><path d="M3 14 C 40 6, 90 4, 197 11" pathLength="1"/></svg></span></span>
+        </h1>
+        <p class="lede" data-hero>Venpadi is the record book for Nigerian vendors. <strong>Sales, spending, debtors and stock in one place,</strong> saved on your phone first and synced when network comes back.</p>
+        <div class="cta-row" data-hero>
+          <a class="btn btn--primary" href="/signup">Start keeping records<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+          <a class="btn btn--ghost" href="#records" data-scroll>See it work</a>
+        </div>
+        <ul class="facts" data-hero>
+          <li><b>4</b> records, one place</li>
+          <li><b>0</b> bars needed to save</li>
+          <li><b>₦</b> exact to the kobo</li>
+        </ul>
+      </div>
+
+      <div class="phone-col">
+        <div class="phone-sticky" id="phone-sticky">
+          <div class="stage3d">
+            <div class="float">
+              <div class="rot" id="rot">
+                <div class="tilt" id="tilt">
+                  <div class="phone" id="phone" aria-label="The Venpadi app">
+                    <div class="phone__edge"></div><div class="phone__edge"></div><div class="phone__edge"></div><div class="phone__edge"></div><div class="phone__edge"></div>
+                    <div class="phone__body"></div>
+                    <i class="phone__btn phone__btn--mute"></i><i class="phone__btn phone__btn--volu"></i><i class="phone__btn phone__btn--vold"></i><i class="phone__btn phone__btn--power"></i>
+                    <div class="phone__screen" id="screen">
+                      <img class="is-active" data-screen="home-revealed" src="assets/screens/home-revealed.jpg" alt="Venpadi Home screen: today's sales and spending, quick actions to add a sale, spending or a debt, things to note, and today's activity" width="780" height="1688" />
+                      <img data-screen="home-masked" src="assets/screens/home-masked.jpg" alt="Venpadi Home screen with totals masked behind stars until tapped" width="780" height="1688" loading="lazy" />
+                      <img data-screen="record-sale" src="assets/screens/record-sale.jpg" alt="Record a sale: amount, transaction type and an optional customer name" width="780" height="1688" loading="lazy" />
+                      <img data-screen="debtors" src="assets/screens/debtors.jpg" alt="Debtors: total outstanding, customers owing and their due dates" width="780" height="1688" loading="lazy" />
+                      <img data-screen="store" src="assets/screens/store.jpg" alt="Stock: items with quantities, low stock and out of stock filters" width="780" height="1688" loading="lazy" />
+                      <img data-screen="business" src="assets/screens/business.jpg" alt="Spent: this week's net total and a breakdown by category" width="780" height="1688" loading="lazy" />
+                      <div class="phone__glare" aria-hidden="true"></div>
+                    </div>
+                    <div class="phone__island" aria-hidden="true"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="chip chip--sale" data-chip aria-hidden="true"><span class="chip__ic"><img src="assets/figma/act2-sale.svg" alt="" /></span><span>Paid Sale<small>Chinedu · 8:47pm</small></span><span class="amt">+₦1,500.00</span></div>
+          <div class="chip chip--saved" data-chip aria-hidden="true"><i class="dot"></i>Saved on device</div>
+          <div class="chip chip--low" data-chip aria-hidden="true"><span class="chip__ic"><img src="assets/figma/note2-lowstock.svg" alt="" /></span><span>3 items are running low<small>Semovita 2kg, Milo Refill</small></span></div>
+          <div class="chip chip--owes" data-chip aria-hidden="true"><span class="chip__ic"><img src="assets/figma/note2-debt.svg" alt="" /></span><span>Mama Chidi<small>Due: 1 day ago</small></span><span class="amt">₦12,000.00</span></div>
+        </div>
+      </div>
+
+      <div class="steps" id="records">
+        <article class="step step--sales" data-step data-screen="record-sale">
+          <span class="step__num">01 · Sales</span>
+          <h3>Record a sale in seconds.</h3>
+          <p>Type the amount, add the customer's name if you want it, save. It lands on your Home screen the same second, network or not.</p>
+          <span class="step__fact">Saves on the phone first</span>
+        </article>
+        <article class="step step--debts" data-step data-screen="debtors">
+          <span class="step__num">02 · Debtors</span>
+          <h3>Know who owes you, and since when.</h3>
+          <p>Give a debt a due date and anyone overdue shows up under Things to note. Part payments bring the balance down. Reminders are for you, inside the app: no messages go to your customers.</p>
+          <span class="step__fact">In-app reminders only</span>
+        </article>
+        <article class="step step--stock" data-step data-screen="store">
+          <span class="step__num">03 · Stock</span>
+          <h3>Count stock when you're ready.</h3>
+          <p>Inventory is optional. An item you haven't counted stays uncounted, never a false zero. Once you count, every sale and restock moves the number, and low stock shows up before you run out.</p>
+          <span class="step__fact">Uncounted is not zero</span>
+        </article>
+        <article class="step step--spent" data-step data-screen="business">
+          <span class="step__num">04 · Spending</span>
+          <h3>See where the money goes.</h3>
+          <p>Transport, rent, utility bills, marketing, repairs. Spending is grouped by category for the week or the month, biggest line first.</p>
+          <span class="step__fact">Week or month view</span>
+        </article>
+        <article class="step step--home" data-step data-screen="home-masked" data-then="home-revealed">
+          <span class="step__num">05 · Home</span>
+          <h3>A clear picture, masked until you tap.</h3>
+          <p>Counts stay visible, so you always know how the day is going. Totals stay hidden until you tap to reveal them, which matters in a busy shop.</p>
+          <span class="step__fact">Tap to reveal</span>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== MARQUEE ===================== -->
+  <div class="marquee" aria-hidden="true">
+    <div class="marquee__track">
+      <div class="marquee__group"><span>For Shop &amp; Product Sellers</span><span>For social media vendors</span><span>For Home &amp; Beauty/Fashion Sellers</span><span>Provisions</span><span>Fashion</span><span>Food &amp; Beverages</span><span>Pharmacy</span><span>Computer &amp; Electronics</span><span>Drinks</span></div>
+      <div class="marquee__group"><span>For Shop &amp; Product Sellers</span><span>For social media vendors</span><span>For Home &amp; Beauty/Fashion Sellers</span><span>Provisions</span><span>Fashion</span><span>Food &amp; Beverages</span><span>Pharmacy</span><span>Computer &amp; Electronics</span><span>Drinks</span></div>
+    </div>
+  </div>
+
+  <!-- ===================== OFFLINE ===================== -->
+  <section class="section offline" id="offline" aria-labelledby="offline-title">
+    <svg class="offline__rings" viewBox="0 0 400 400" aria-hidden="true"><circle cx="200" cy="200" r="60"/><circle cx="200" cy="200" r="110"/><circle cx="200" cy="200" r="160"/><circle cx="200" cy="200" r="199"/></svg>
+    <div class="container offline__grid">
+      <div>
+        <p class="kicker" data-reveal>Offline first</p>
+        <h2 class="h2" id="offline-title" data-reveal>Network comes and goes. <em>Your records don't.</em></h2>
+        <p class="sub" data-reveal>Every record saves on your phone first. When there is network, Venpadi syncs it to your account. A sale is never blocked while it waits.</p>
+        <div class="offline__rules" data-reveal-group>
+          <div class="rule"><span class="rule__ic">3d</span><div><b>A warning, never a lockout.</b><span>Records waiting to sync turn amber after 3 days and red after 7. You can keep recording the whole time.</span></div></div>
+          <div class="rule"><span class="rule__ic">PIN</span><div><b>Your PIN opens the app without network.</b><span>Sign up and the first login on a phone need network. After that, your 4-digit PIN is checked on the phone itself.</span></div></div>
+          <div class="rule"><span class="rule__ic">↻</span><div><b>New phone, same books.</b><span>Log in on another phone and everything that reached your account comes back.</span></div></div>
+        </div>
+      </div>
+      <div class="demo" data-reveal aria-label="A sale saving on the phone while the network drops, then syncing when it returns">
+        <div class="demo__bar"><span class="signal" aria-hidden="true"><i></i><i></i><i></i><i></i></span><span class="demo__status"></span></div>
+        <div class="demo__row"><span class="demo__ic"><img src="assets/figma/act2-sale.svg" alt="" /></span><span><b>Paid Sale</b><small>2 items · Aunty Bola</small></span><span class="demo__amt">+₦8,500.00</span></div>
+        <span class="demo__pill"></span>
+        <p class="demo__note">The sale is on the phone the moment you save. Sync happens on its own when network returns.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== RULES ===================== -->
+  <section class="section" id="rules" aria-labelledby="rules-title">
+    <div class="container">
+      <div class="section__head">
+        <p class="kicker" data-reveal>The record contract</p>
+        <h2 class="h2" id="rules-title" data-reveal>Rules the app keeps, so you don't have to.</h2>
+        <p class="sub" data-reveal>A record book is only useful if you can trust it. These are built into Venpadi, not left to habit.</p>
+      </div>
+      <div class="bento" data-reveal-group>
+        <div class="tile tile--wide"><span class="tile__ic"><img src="assets/figma/nt-receipt.svg" alt="" /></span><h3>Nothing deletes.</h3><p>A wrong sale, expense, debt or payment is reversed with a reason. It keeps its place in the list with a mark, so the full story is always there.</p></div>
+        <div class="tile tile--ink"><span class="tile__ic">₦</span><h3>Exact to the kobo.</h3><p>Money is stored in kobo as whole numbers. ₦1,500.00 is always ₦1,500.00, with no rounding anywhere.</p></div>
+        <div class="tile"><span class="tile__ic"><img src="assets/figma/nt-chart.svg" alt="" /></span><h3>Totals are worked out, never guessed.</h3><p>Stock on hand is the sum of every movement. A customer's balance is debts minus repayments.</p></div>
+        <div class="tile"><span class="tile__ic"><img src="assets/figma/nt-package.svg" alt="" /></span><h3>Inventory is optional.</h3><p>Tracking starts the first time you count an item. Until then it stays uncounted, never shown as zero.</p></div>
+        <div class="tile"><span class="tile__ic"><img src="assets/figma/fingerprint.png" alt="" /></span><h3>It keeps records, not money.</h3><p>Venpadi is not a wallet and not a bank. Nothing moves through it. Your PIN and fingerprint protect what you've written down.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== HEALTH ===================== -->
+  <section class="section" id="health" aria-labelledby="health-title" style="background: linear-gradient(180deg, var(--bg), var(--wash-2));">
+    <div class="container health__grid">
+      <div>
+        <p class="kicker" data-reveal>Business Health</p>
+        <h2 class="h2" id="health-title" data-reveal>A habit meter, not a verdict.</h2>
+        <p class="sub" data-reveal>Business Health measures how complete your records are, nothing else. Four habits with fixed weights, recomputed every night. A new account starts with no score, not a low one. It is not a credit score.</p>
+        <ul class="legend" data-reveal-group>
+          <li><i style="background: var(--brand)"></i>Log your sales regularly<b>35%</b></li>
+          <li><i style="background: var(--ok)"></i>Keep stock up to date<b>25%</b></li>
+          <li><i style="background: var(--orange)"></i>Track your expenses<b>20%</b></li>
+          <li><i style="background: var(--yellow-deep)"></i>Keep customer balances current<b>20%</b></li>
+        </ul>
+        <div class="bands" data-reveal><span class="band band--b">Building 0–39</span><span class="band band--d">Developing 40–69</span><span class="band band--s">Strong 70–100</span></div>
+      </div>
+      <div class="ring-wrap" data-reveal>
+        <svg class="ring" id="ring" viewBox="0 0 200 200" role="img" aria-label="Ring showing the four habit weights: sales 35 percent, stock 25, expenses 20, customer balances 20">
+          <circle class="track" cx="100" cy="100" r="78"/>
+          <circle class="arc" cx="100" cy="100" r="78" stroke="#540298" data-pct="35" data-offset="0"/>
+          <circle class="arc" cx="100" cy="100" r="78" stroke="#218C54" data-pct="25" data-offset="35"/>
+          <circle class="arc" cx="100" cy="100" r="78" stroke="#F16619" data-pct="20" data-offset="60"/>
+          <circle class="arc" cx="100" cy="100" r="78" stroke="#D2BA31" data-pct="20" data-offset="80"/>
+        </svg>
+        <div class="ring__center"><b>4</b><span>habits, weighted</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== WHO ===================== -->
+  <section class="section" id="who" aria-labelledby="who-title">
+    <div class="container">
+      <div class="section__head">
+        <p class="kicker" data-reveal>Who it's for</p>
+        <h2 class="h2" id="who-title" data-reveal>Made for how you sell.</h2>
+      </div>
+      <div class="who" data-reveal-group>
+        <article class="persona persona--landscape"><img src="assets/figma/illustration-splash1-trim.png" alt="Three vendors at their shop counters" width="800" height="280" loading="lazy" /><span class="persona__fade" aria-hidden="true"></span><div class="persona__copy"><span class="persona__badge">For Shop &amp; Product Sellers</span><h3>Your business deserves more than just sales</h3></div></article>
+        <article class="persona"><img src="assets/figma/illustration-splash2.png" alt="A vendor selling through their phone" width="320" height="521" loading="lazy" /><span class="persona__fade" aria-hidden="true"></span><div class="persona__copy"><span class="persona__badge">For social media vendors</span><h3>Turn your social audience into customers</h3></div></article>
+        <article class="persona"><img src="assets/figma/illustration-splash3.png" alt="A home and beauty seller with their products" width="320" height="521" loading="lazy" /><span class="persona__fade" aria-hidden="true"></span><div class="persona__copy"><span class="persona__badge">For Home &amp; Beauty/Fashion Sellers</span><h3>Build your business from wherever you are</h3></div></article>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== ONLINE SHOP (designed, not built yet) ===================== -->
+  <section class="section shop" id="shop" aria-labelledby="shop-title">
+    <div class="container shop__grid">
+      <div>
+        <p class="kicker" data-reveal>Coming next</p>
+        <h2 class="h2" id="shop-title" data-reveal>Your shop, online. <em>In the design, on the way.</em></h2>
+        <p class="sub" data-reveal>An online shop for your business is part of the Venpadi design and is the next thing being built. It is not in the app today. Details will be shared when it ships.</p>
+        <ul class="shop__list" data-reveal-group>
+          <li><span class="shop__ic"><img src="assets/figma/me-shop.svg" alt="" /></span><div><b>Designed, not built yet.</b><span>The storefront screens exist in the design file; the app does not have them yet.</span></div></li>
+          <li><span class="shop__ic"><img src="assets/figma/nt-bell.svg" alt="" /></span><div><b>Shop orders will be a notification type.</b><span>The notification settings in the design include a switch for shop orders.</span></div></li>
+          <li><span class="shop__ic"><img src="assets/figma/nt-package.svg" alt="" /></span><div><b>Still records only.</b><span>Whatever the shop becomes, Venpadi keeps records. It does not take payments.</span></div></li>
+        </ul>
+      </div>
+      <div class="shop__art" data-reveal aria-hidden="true">
+        <div class="shop__card">
+          <div class="shop__card-top"><img src="assets/figma/logo-mark-sm.svg" alt="" width="22" height="21" /><span>Mama Njideka Provisions</span><i>Designed</i></div>
+          <div class="shop__placeholder"><img src="assets/figma/me-shop.svg" alt="" width="40" height="40" /><b>Online shop</b><span>In the design file. Not in the app yet.</span></div>
+        </div>
+        <span class="shop__stamp">Not in the app yet</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== FAQ ===================== -->
+  <section class="section" id="faq" aria-labelledby="faq-title" style="padding-top: 0;">
+    <div class="container">
+      <div class="section__head" style="margin-inline: auto; text-align: center;">
+        <p class="kicker" data-reveal>FAQ</p>
+        <h2 class="h2" id="faq-title" data-reveal>Straight answers.</h2>
+      </div>
+      <div class="faq" data-reveal-group>
+        <details><summary>Does Venpadi move money?</summary><p>No. Venpadi keeps records of what you sold, spent, are owed and have in stock. It is not a wallet, a bank or a payment app, and nothing passes through it.</p></details>
+        <details><summary>Does it work without network?</summary><p>Yes. Every record saves on your phone first, whatever the network is doing. When there is network, it syncs to your account. Records waiting to sync only ever show a warning; nothing locks.</p></details>
+        <details><summary>What if I record something by mistake?</summary><p>You reverse it with a reason. The record stays in the list with a reversed mark, so your history stays complete and your totals stay honest.</p></details>
+        <details><summary>Will my customers get SMS or WhatsApp reminders?</summary><p>No. Reminders about overdue debts appear inside the app, for you. Venpadi never messages your customers.</p></details>
+        <details><summary>Is Business Health a credit score?</summary><p>No. It measures how complete your record keeping is, across four habits with fixed weights. It is recomputed every night and a fresh account has no score at all until the first sale.</p></details>
+        <details><summary>Is there an online shop?</summary><p>Not yet. An online shop is in the Venpadi design and is the next thing being built, but it is not in the app today. Like everything else in Venpadi, it will keep records only and will not take payments.</p></details>
+        <details><summary>What if I lose my phone?</summary><p>Log in on another phone with your number and PIN. Everything that reached your account syncs back. The first login on a new phone needs network.</p></details>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== FINAL CTA ===================== -->
+  <section class="final" id="get-started" aria-labelledby="final-title">
+    <span class="final__blob" aria-hidden="true"></span><span class="final__blob final__blob--y" aria-hidden="true"></span>
+    <div>
+      <p class="kicker" style="color: var(--yellow)" data-reveal>Get started</p>
+      <h2 class="h2" id="final-title" data-reveal>Start your records <em>today.</em></h2>
+      <p class="sub" data-reveal>Sign up with your phone number and a 4-digit PIN. The first login needs network; after that, your PIN opens the app anywhere.</p>
+      <div class="cta-row" data-reveal>
+        <a class="btn btn--yellow" href="/signup">Create your account</a>
+        <a class="btn btn--ghost" style="background: rgba(255,255,255,0.1); color: #fff;" href="/login">Already a vendor? Log in</a>
+      </div>
+    </div>
+    <div class="final__phone" aria-hidden="true"><img src="assets/screens/home-revealed.jpg" alt="" width="780" height="1688" loading="lazy" /></div>
+  </section>
+
+  <footer class="container footer">
+    <a class="brand" href="#top" style="font-size: 19px;"><img src="assets/figma/logo-mark-sm.svg" alt="" width="24" height="23" />Venpadi</a>
+    <ul class="footer__links">
+      <li><a href="#records">Records</a></li>
+      <li><a href="#offline">Offline</a></li>
+      <li><a href="#rules">Rules</a></li>
+      <li><a href="#health">Business Health</a></li>
+      <li><a href="#shop">Online shop</a></li>
+      <li><a href="#faq">FAQ</a></li>
+    </ul>
+    <p>Vendors padi. Records for Nigerian vendors. © 2026 Venpadi</p>
+  </footer>
+</main>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.13.0/gsap.min.js" integrity="sha384-HOvlOYPIs/zjoIkWUGXkVmXsjr8GuZLV+Q+rcPwmJOVZVpvTSXQChiN4t9Euv9Vc" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.13.0/ScrollTrigger.min.js" integrity="sha384-P8VzCVnT9NBUkMrpcIZrJbA7EBjJvh/fJS6PmP+4nLIM284DtsImIv8D0fFjIkeh" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/lenis@1.3.4/dist/lenis.min.js" integrity="sha384-FKTX0CNJ8ngN1oGMBReVu7mvjTJyjFiD5etb1NKnYxc+8eFI2O0KWnksTN+oTFcu" crossorigin="anonymous"></script>
+<script>
+(function () {
+  'use strict';
+  var reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var hasGsap = typeof window.gsap !== 'undefined' && typeof window.ScrollTrigger !== 'undefined';
+  var nav = document.getElementById('nav');
+  var screen = document.getElementById('screen');
+  var steps = Array.prototype.slice.call(document.querySelectorAll('[data-step]'));
+  var thenTimer = null;
+
+  function setScreen(name) {
+    var imgs = screen.querySelectorAll('img');
+    for (var i = 0; i < imgs.length; i++) imgs[i].classList.toggle('is-active', imgs[i].dataset.screen === name);
+  }
+  function activateStep(step) {
+    clearTimeout(thenTimer);
+    setScreen(step.dataset.screen);
+    if (step.dataset.then) thenTimer = setTimeout(function () { setScreen(step.dataset.then); }, 1100);
+  }
+
+  /* Nav background */
+  function onScrollPos(y) { nav.classList.toggle('is-scrolled', y > 24); }
+  onScrollPos(window.scrollY);
+
+  /* Spotlight on bento tiles */
+  document.querySelectorAll('.tile').forEach(function (tile) {
+    tile.addEventListener('pointermove', function (e) {
+      var r = tile.getBoundingClientRect();
+      tile.style.setProperty('--mx', (e.clientX - r.left) + 'px');
+      tile.style.setProperty('--my', (e.clientY - r.top) + 'px');
+    });
+  });
+
+  /* Health ring: 2πr for r=78 ≈ 490.09 */
+  var ring = document.getElementById('ring');
+  var CIRC = 2 * Math.PI * 78;
+  function fillRing() {
+    ring.querySelectorAll('.arc').forEach(function (arc) {
+      var pct = Number(arc.dataset.pct), off = Number(arc.dataset.offset);
+      var gap = 1.2; // small breathing room between arcs, in percent
+      arc.style.strokeDashoffset = String(-(off / 100) * CIRC);
+      arc.style.strokeDasharray = ((pct - gap) / 100 * CIRC) + ' ' + CIRC;
+    });
+  }
+
+  /* ---------- Reduced motion or no GSAP: static, in-order page ---------- */
+  if (reduced || !hasGsap) {
+    document.querySelectorAll('.h1 .hl path').forEach(function (p) { p.style.strokeDashoffset = 0; });
+    fillRing();
+    window.addEventListener('scroll', function () { onScrollPos(window.scrollY); }, { passive: true });
+    if ('IntersectionObserver' in window) {
+      var io = new IntersectionObserver(function (entries) {
+        entries.forEach(function (en) { if (en.isIntersecting) activateStep(en.target); });
+      }, { rootMargin: '-45% 0px -45% 0px' });
+      steps.forEach(function (s) { io.observe(s); });
+    }
+    return;
+  }
+
+  /* ---------- Full motion ---------- */
+  gsap.registerPlugin(ScrollTrigger);
+
+  var lenis = null;
+  if (typeof window.Lenis !== 'undefined') {
+    lenis = new Lenis({ lerp: 0.09, smoothWheel: true });
+    lenis.on('scroll', function (e) { ScrollTrigger.update(); onScrollPos(e.scroll); });
+    gsap.ticker.add(function (time) { lenis.raf(time * 1000); });
+    gsap.ticker.lagSmoothing(0);
+  } else {
+    window.addEventListener('scroll', function () { onScrollPos(window.scrollY); }, { passive: true });
+  }
+
+  /* In-page links scroll smoothly through Lenis */
+  document.querySelectorAll('a[href^="#"]').forEach(function (a) {
+    a.addEventListener('click', function (e) {
+      var target = document.querySelector(a.getAttribute('href'));
+      if (!target) return;
+      e.preventDefault();
+      if (lenis) lenis.scrollTo(target, { offset: -8, duration: 1.4 });
+      else target.scrollIntoView({ behavior: 'smooth' });
+    });
+  });
+
+  /* Hero entrance, after the intro curtain */
+  var intro = gsap.timeline({ delay: 1.25 });
+  intro.from('.h1 .line > span', { yPercent: 110, duration: 1.1, ease: 'power4.out', stagger: 0.09 }, 0)
+       .from('.eyebrow', { y: 16, opacity: 0, duration: .8, ease: 'power3.out' }, 0.1)
+       .from('[data-hero]', { y: 28, opacity: 0, duration: .9, ease: 'power3.out', stagger: 0.1 }, 0.45)
+       .to('.h1 .hl path', { strokeDashoffset: 0, duration: .8, ease: 'power2.inOut' }, 0.75)
+       .from('.phone', { y: 80, rotationY: -40, opacity: 0, duration: 1.5, ease: 'power4.out', transformOrigin: '50% 50%' }, 0.15)
+       .from('[data-chip]', { scale: .7, opacity: 0, duration: .9, ease: 'back.out(1.6)', stagger: 0.12 }, 0.9);
+
+  /* Pointer tilt: light parallax on desktop pointers only */
+  var tilt = document.getElementById('tilt');
+  if (window.matchMedia('(hover: hover) and (pointer: fine)').matches) {
+    var toRy = gsap.quickTo(tilt, 'rotationY', { duration: 0.9, ease: 'power3.out' });
+    var toRx = gsap.quickTo(tilt, 'rotationX', { duration: 0.9, ease: 'power3.out' });
+    var stage = document.querySelector('.stage');
+    stage.addEventListener('pointermove', function (e) {
+      var nx = (e.clientX / window.innerWidth) * 2 - 1;
+      var ny = (e.clientY / window.innerHeight) * 2 - 1;
+      toRy(nx * 12); toRx(-ny * 9);
+    });
+    stage.addEventListener('pointerleave', function () { toRy(0); toRx(0); });
+  }
+
+  /* Scroll-scrubbed rotation across hero and story */
+  var rot = document.getElementById('rot');
+  gsap.set(rot, { rotationY: -16, rotationX: 4 });
+  var scrub = gsap.timeline({
+    scrollTrigger: { trigger: '.stage-grid', start: 'top top', end: 'bottom bottom', scrub: 1.2 }
+  });
+  var poses = [
+    { rotationY: 12, rotationX: 2 },   // 01 sales
+    { rotationY: -11, rotationX: 3 },  // 02 debtors
+    { rotationY: 13, rotationX: 1 },   // 03 stock
+    { rotationY: -9, rotationX: 3 },   // 04 spending
+    { rotationY: 0, rotationX: 0 }     // 05 home
+  ];
+  poses.forEach(function (p) { scrub.to(rot, Object.assign({ duration: 1, ease: 'none' }, p)); });
+
+  /* Chips drift away as the hero scrolls out */
+  gsap.to('[data-chip]', {
+    y: -60, opacity: 0, stagger: 0.04, ease: 'none',
+    scrollTrigger: { trigger: '.hero-copy', start: 'bottom 80%', end: 'bottom 30%', scrub: true }
+  });
+
+  /* Steps drive the screen; the hero shows Home */
+  ScrollTrigger.create({
+    trigger: '.hero-copy', start: 'top top', end: 'bottom 55%',
+    onToggle: function (self) { if (self.isActive) { clearTimeout(thenTimer); setScreen('home-revealed'); } }
+  });
+  steps.forEach(function (step) {
+    ScrollTrigger.create({
+      trigger: step, start: 'top 55%', end: 'bottom 55%',
+      onToggle: function (self) { if (self.isActive) activateStep(step); }
+    });
+    gsap.from(step.children, {
+      y: 36, opacity: 0, duration: .9, ease: 'power3.out', stagger: 0.08,
+      scrollTrigger: { trigger: step, start: 'top 75%' }
+    });
+  });
+
+  /* Section reveals */
+  gsap.utils.toArray('[data-reveal]').forEach(function (el) {
+    gsap.from(el, { y: 36, opacity: 0, duration: 1, ease: 'power3.out', scrollTrigger: { trigger: el, start: 'top 88%' } });
+  });
+  gsap.utils.toArray('[data-reveal-group]').forEach(function (group) {
+    gsap.from(group.children, { y: 40, opacity: 0, duration: .9, ease: 'power3.out', stagger: 0.09, scrollTrigger: { trigger: group, start: 'top 85%' } });
+  });
+
+  /* Health ring fills when it comes into view */
+  ScrollTrigger.create({ trigger: ring, start: 'top 80%', once: true, onEnter: fillRing });
+
+  /* Keep ScrollTrigger measurements fresh once images and fonts settle */
+  window.addEventListener('load', function () { ScrollTrigger.refresh(); });
+})();
+</script>
+</body>
+</html>
