@@ -455,6 +455,35 @@ p { margin: 0; }
 .footer__links { display: flex; flex-wrap: wrap; gap: 18px; list-style: none; margin: 0; padding: 0; font-weight: 600; }
 .footer__links a:hover { color: var(--ink); }
 
+/* ---------- Platform line + final note ---------- */
+.platforms { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-top: 26px; font-size: 14.5px; font-weight: 600; color: var(--sub); }
+.platforms__dot { width: 8px; height: 8px; border-radius: 50%; background: var(--ok); box-shadow: 0 0 0 4px rgba(33,140,84,.15); }
+.platforms a { color: var(--brand-dark); text-decoration: underline; text-underline-offset: 3px; text-decoration-color: rgba(84,2,152,.35); }
+.platforms a:hover { text-decoration-color: currentColor; }
+.final__note { margin-top: 18px; font-size: 14.5px; font-weight: 600; color: rgba(255,255,255,0.7); }
+
+/* ---------- Get-the-app sheet ---------- */
+.store { border: 0; padding: 0; background: transparent; max-width: min(520px, calc(100vw - 32px)); width: 100%; }
+.store::backdrop { background: rgba(0, 18, 18, 0.55); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); }
+.store[open] { animation: storeIn .4s cubic-bezier(.2,.8,.2,1); }
+@keyframes storeIn { from { transform: translateY(24px) scale(.97); opacity: 0; } to { transform: none; opacity: 1; } }
+.store__inner { position: relative; background: var(--card); color: var(--ink); border-radius: var(--r-sheet); padding: clamp(28px, 5vw, 44px); text-align: center; box-shadow: 0 40px 80px -30px rgba(28, 0, 52, 0.6); }
+.store__close { position: absolute; top: 16px; right: 16px; width: 40px; height: 40px; border: 0; border-radius: 50%; background: var(--neutral, #F2F2F2); font-size: 24px; line-height: 1; cursor: pointer; color: var(--ink); }
+.store__close:hover { background: var(--tile-purple); }
+.store__mark { margin: 0 auto 14px; }
+.store__title { font-size: clamp(26px, 3.4vw, 34px); font-weight: 800; letter-spacing: -0.03em; }
+.store__text { margin-top: 12px; color: var(--sub); font-size: 16px; }
+.store__buttons { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 24px; }
+.store__btn { display: flex; flex-direction: column; align-items: flex-start; justify-content: center; gap: 2px; padding: 12px 18px; min-height: 60px; border-radius: var(--r-button); background: var(--ink); color: #fff; text-align: left; transition: transform .25s cubic-bezier(.2,.8,.2,1), background-color .25s; }
+.store__btn:hover { transform: translateY(-2px); background: #0a2a2a; }
+.store__btn b { font-family: var(--display); font-weight: 800; font-size: 18px; letter-spacing: -0.02em; }
+.store__small { font-size: 11px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: rgba(255,255,255,0.65); }
+.store__btn.is-pending { background: var(--tile-purple); color: var(--brand-dark); cursor: default; }
+.store__btn.is-pending .store__small { color: rgba(68, 2, 121, 0.65); }
+.store__btn.is-pending:hover { transform: none; }
+.store__hint { margin-top: 16px; font-size: 13.5px; font-weight: 600; color: var(--sub); min-height: 1.4em; }
+@media (max-width: 480px) { .store__buttons { grid-template-columns: 1fr; } }
+
 /* ---------- Responsive ---------- */
 @media (max-width: 1000px) {
   .bento { grid-template-columns: repeat(2, minmax(0, 1fr)); }
@@ -497,7 +526,7 @@ p { margin: 0; }
 }
 @media (prefers-reduced-motion: reduce) {
   .intro { animation-delay: 0s; animation-duration: .01s; }
-  .intro__mark, .float, .chip, .blob, .phone__glare, .marquee__track, .signal i, .demo__row, .demo__pill, .demo__pill::after, .demo__status::before { animation: none !important; }
+  .intro__mark, .float, .chip, .blob, .phone__glare, .marquee__track, .signal i, .demo__row, .demo__pill, .demo__pill::after, .demo__status::before, .store[open] { animation: none !important; }
   .phone__screen img, .tile, .persona, .btn, .faq summary::after { transition: none !important; }
   html { scroll-behavior: smooth; }
 }
@@ -520,7 +549,7 @@ p { margin: 0; }
         <li><a href="#faq">FAQ</a></li>
       </ul>
     </nav>
-    <a class="btn btn--primary btn--sm" href="/signup">Get started</a>
+    <a class="btn btn--primary btn--sm" href="#get-the-app" data-store>Get the app</a>
   </div>
 </header>
 
@@ -540,7 +569,7 @@ p { margin: 0; }
         </h1>
         <p class="lede" data-hero>Venpadi is the record book for Nigerian vendors. <strong>Sales, spending, debtors and stock in one place,</strong> saved on your phone first and synced when network comes back.</p>
         <div class="cta-row" data-hero>
-          <a class="btn btn--primary" href="/signup">Start keeping records<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+          <a class="btn btn--primary" href="#get-the-app" data-store>Get the app<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
           <a class="btn btn--ghost" href="#records" data-scroll>See it work</a>
         </div>
         <ul class="facts" data-hero>
@@ -548,6 +577,7 @@ p { margin: 0; }
           <li><b>0</b> bars needed to save</li>
           <li><b>₦</b> exact to the kobo</li>
         </ul>
+        <p class="platforms" data-hero><span class="platforms__dot"></span>A phone app for Android and iPhone. <a href="#get-the-app" data-store>Already a vendor? Open it on your phone.</a></p>
       </div>
 
       <div class="phone-col">
@@ -716,9 +746,9 @@ p { margin: 0; }
       <div>
         <p class="kicker" data-reveal>Coming next</p>
         <h2 class="h2" id="shop-title" data-reveal>Your shop, online. <em>In the design, on the way.</em></h2>
-        <p class="sub" data-reveal>An online shop for your business is part of the Venpadi design and is the next thing being built. It is not in the app today. Details will be shared when it ships.</p>
+        <p class="sub" data-reveal>An online shop for your business is part of the Venpadi design and is the next thing being built. It will be the one part of Venpadi on the web: a storefront page where your buyers shop, while you keep running things from the app. It is not built yet.</p>
         <ul class="shop__list" data-reveal-group>
-          <li><span class="shop__ic"><img src="assets/figma/me-shop.svg" alt="" /></span><div><b>Designed, not built yet.</b><span>The storefront screens exist in the design file; the app does not have them yet.</span></div></li>
+          <li><span class="shop__ic"><img src="assets/figma/me-shop.svg" alt="" /></span><div><b>Designed, not built yet.</b><span>The storefront screens exist in the design file. Buyers will open it in a browser; the app stays on your phone.</span></div></li>
           <li><span class="shop__ic"><img src="assets/figma/nt-bell.svg" alt="" /></span><div><b>Shop orders will be a notification type.</b><span>The notification settings in the design include a switch for shop orders.</span></div></li>
           <li><span class="shop__ic"><img src="assets/figma/nt-package.svg" alt="" /></span><div><b>Still records only.</b><span>Whatever the shop becomes, Venpadi keeps records. It does not take payments.</span></div></li>
         </ul>
@@ -746,6 +776,7 @@ p { margin: 0; }
         <details><summary>What if I record something by mistake?</summary><p>You reverse it with a reason. The record stays in the list with a reversed mark, so your history stays complete and your totals stay honest.</p></details>
         <details><summary>Will my customers get SMS or WhatsApp reminders?</summary><p>No. Reminders about overdue debts appear inside the app, for you. Venpadi never messages your customers.</p></details>
         <details><summary>Is Business Health a credit score?</summary><p>No. It measures how complete your record keeping is, across four habits with fixed weights. It is recomputed every night and a fresh account has no score at all until the first sale.</p></details>
+        <details><summary>Is there a web version I can log in to?</summary><p>No. Venpadi is a phone app for Android and iPhone; there is no web login. The only web part in the design is the online shop, a storefront page for your buyers, and that is not built yet.</p></details>
         <details><summary>Is there an online shop?</summary><p>Not yet. An online shop is in the Venpadi design and is the next thing being built, but it is not in the app today. Like everything else in Venpadi, it will keep records only and will not take payments.</p></details>
         <details><summary>What if I lose my phone?</summary><p>Log in on another phone with your number and PIN. Everything that reached your account syncs back. The first login on a new phone needs network.</p></details>
       </div>
@@ -756,13 +787,14 @@ p { margin: 0; }
   <section class="final" id="get-started" aria-labelledby="final-title">
     <span class="final__blob" aria-hidden="true"></span><span class="final__blob final__blob--y" aria-hidden="true"></span>
     <div>
-      <p class="kicker" style="color: var(--yellow)" data-reveal>Get started</p>
+      <p class="kicker" style="color: var(--yellow)" data-reveal>Get the app</p>
       <h2 class="h2" id="final-title" data-reveal>Start your records <em>today.</em></h2>
-      <p class="sub" data-reveal>Sign up with your phone number and a 4-digit PIN. The first login needs network; after that, your PIN opens the app anywhere.</p>
+      <p class="sub" data-reveal>Venpadi lives on your phone. Install it from Google Play or the App Store, sign up with your phone number and a 4-digit PIN, and you're recording. The first login needs network; after that, your PIN opens the app anywhere.</p>
       <div class="cta-row" data-reveal>
-        <a class="btn btn--yellow" href="/signup">Create your account</a>
-        <a class="btn btn--ghost" style="background: rgba(255,255,255,0.1); color: #fff;" href="/login">Already a vendor? Log in</a>
+        <a class="btn btn--yellow" href="#get-the-app" data-store data-store-platform="android">Get it on Google Play</a>
+        <a class="btn btn--ghost" style="background: rgba(255,255,255,0.1); color: #fff;" href="#get-the-app" data-store data-store-platform="ios">Download on the App Store</a>
       </div>
+      <p class="final__note" data-reveal>Already a vendor? There is no web login. Open the Venpadi app on your phone.</p>
     </div>
     <div class="final__phone" aria-hidden="true"><img src="assets/screens/home-revealed.jpg" alt="" width="780" height="1688" loading="lazy" /></div>
   </section>
@@ -780,6 +812,23 @@ p { margin: 0; }
     <p>Vendors padi. Records for Nigerian vendors. © 2026 Venpadi</p>
   </footer>
 </main>
+
+<!-- "Get the app" sheet: every sign-up / log-in action lands here, because
+     Venpadi has no web app. Store URLs live in STORE_LINKS in the script; while
+     a link is empty the button tells the visitor to search the store instead. -->
+<dialog class="store" id="get-the-app" aria-labelledby="store-title">
+  <div class="store__inner">
+    <button class="store__close" type="button" data-store-close aria-label="Close">×</button>
+    <img class="store__mark" src="assets/figma/logo-mark-sm.svg" alt="" width="36" height="35" />
+    <h2 class="store__title" id="store-title">Venpadi is on your phone.</h2>
+    <p class="store__text" id="store-text">There is no web version to log in to. Install the app, sign up with your phone number and a 4-digit PIN, and your records start on the phone.</p>
+    <div class="store__buttons">
+      <a class="store__btn" id="store-android" href="#" rel="noopener"><span class="store__small">Get it on</span><b>Google Play</b></a>
+      <a class="store__btn" id="store-ios" href="#" rel="noopener"><span class="store__small">Download on the</span><b>App Store</b></a>
+    </div>
+    <p class="store__hint" id="store-hint"></p>
+  </div>
+</dialog>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.13.0/gsap.min.js" integrity="sha384-HOvlOYPIs/zjoIkWUGXkVmXsjr8GuZLV+Q+rcPwmJOVZVpvTSXQChiN4t9Euv9Vc" crossorigin="anonymous"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.13.0/ScrollTrigger.min.js" integrity="sha384-P8VzCVnT9NBUkMrpcIZrJbA7EBjJvh/fJS6PmP+4nLIM284DtsImIv8D0fFjIkeh" crossorigin="anonymous"></script>
@@ -807,6 +856,61 @@ p { margin: 0; }
   /* Nav background */
   function onScrollPos(y) { nav.classList.toggle('is-scrolled', y > 24); }
   onScrollPos(window.scrollY);
+
+  /* ---------- Get-the-app sheet ----------
+     Venpadi is a phone app with no web login, so every sign-up / log-in action
+     opens this sheet and points at the stores. Fill STORE_LINKS when the
+     listings exist; an empty link shows "search the store" instead of a 404. */
+  var STORE_LINKS = {
+    android: '', // e.g. https://play.google.com/store/apps/details?id=…
+    ios: ''      // e.g. https://apps.apple.com/ng/app/…
+  };
+  var STORE_NAMES = { android: 'Google Play', ios: 'the App Store' };
+  var storeDialog = document.getElementById('get-the-app');
+  var storeHint = document.getElementById('store-hint');
+  var storeText = document.getElementById('store-text');
+  var redirectTimer = null;
+
+  function detectPlatform() {
+    var ua = navigator.userAgent || '';
+    if (/android/i.test(ua)) return 'android';
+    if (/iphone|ipad|ipod/i.test(ua) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1)) return 'ios';
+    return null;
+  }
+  function setupStoreButton(platform) {
+    var a = document.getElementById('store-' + platform);
+    var link = STORE_LINKS[platform];
+    if (link) { a.href = link; a.target = '_blank'; a.classList.remove('is-pending'); }
+    else {
+      a.removeAttribute('target'); a.href = '#get-the-app'; a.classList.add('is-pending');
+      a.setAttribute('aria-disabled', 'true');
+      a.addEventListener('click', function (e) { e.preventDefault(); storeHint.textContent = 'Search for "Venpadi" on ' + STORE_NAMES[platform] + '. The direct link is on its way.'; });
+    }
+  }
+  setupStoreButton('android'); setupStoreButton('ios');
+
+  function openStore(preferred) {
+    clearTimeout(redirectTimer);
+    var platform = preferred || detectPlatform();
+    storeHint.textContent = '';
+    storeText.textContent = 'There is no web version to log in to. Install the app, sign up with your phone number and a 4-digit PIN, and your records start on the phone.';
+    if (platform && STORE_LINKS[platform]) {
+      // On a phone with a known listing, go straight there after a short beat.
+      storeHint.textContent = 'Taking you to ' + STORE_NAMES[platform] + '…';
+      redirectTimer = setTimeout(function () { window.location.href = STORE_LINKS[platform]; }, 1600);
+    } else if (platform) {
+      storeHint.textContent = 'Search for "Venpadi" on ' + STORE_NAMES[platform] + '.';
+    }
+    if (typeof storeDialog.showModal === 'function') { if (!storeDialog.open) storeDialog.showModal(); }
+    else storeDialog.setAttribute('open', '');
+  }
+  function closeStore() { clearTimeout(redirectTimer); if (storeDialog.open) storeDialog.close(); else storeDialog.removeAttribute('open'); }
+  document.querySelectorAll('[data-store]').forEach(function (a) {
+    a.addEventListener('click', function (e) { e.preventDefault(); openStore(a.dataset.storePlatform || null); });
+  });
+  document.querySelectorAll('[data-store-close]').forEach(function (b) { b.addEventListener('click', closeStore); });
+  storeDialog.addEventListener('click', function (e) { if (e.target === storeDialog) closeStore(); });
+  storeDialog.addEventListener('close', function () { clearTimeout(redirectTimer); });
 
   /* Spotlight on bento tiles */
   document.querySelectorAll('.tile').forEach(function (tile) {
@@ -856,8 +960,8 @@ p { margin: 0; }
     window.addEventListener('scroll', function () { onScrollPos(window.scrollY); }, { passive: true });
   }
 
-  /* In-page links scroll smoothly through Lenis */
-  document.querySelectorAll('a[href^="#"]').forEach(function (a) {
+  /* In-page links scroll smoothly through Lenis (store links open the sheet instead) */
+  document.querySelectorAll('a[href^="#"]:not([data-store])').forEach(function (a) {
     a.addEventListener('click', function (e) {
       var target = document.querySelector(a.getAttribute('href'));
       if (!target) return;
