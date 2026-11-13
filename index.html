@@ -11,7 +11,10 @@
 <meta property="og:description" content="Sales, spending, debtors and stock in one place. Saves without network. Nothing ever deletes." />
 <meta property="og:type" content="website" />
 <meta property="og:image" content="assets/screens/home-revealed.jpg" />
-<link rel="icon" href="assets/app-icon.png" />
+<link rel="icon" type="image/svg+xml" href="assets/figma/logo-mark-sm.svg" />
+<link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32.png" />
+<link rel="icon" type="image/png" sizes="512x512" href="assets/icon-512.png" />
+<link rel="apple-touch-icon" sizes="180x180" href="assets/apple-touch-icon.png" />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,600;12..96,700;12..96,800&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
@@ -463,7 +466,10 @@ p { margin: 0; }
 .final__note { margin-top: 18px; font-size: 14.5px; font-weight: 600; color: rgba(255,255,255,0.7); }
 
 /* ---------- Get-the-app sheet ---------- */
-.store { border: 0; padding: 0; background: transparent; max-width: min(520px, calc(100vw - 32px)); width: 100%; }
+.store { border: 0; padding: 0; background: transparent; max-width: min(520px, calc(100vw - 32px)); width: 100%; overscroll-behavior: contain; }
+/* While the sheet is open the page behind it must not scroll: native <dialog>
+   does not lock the document, and Lenis would keep driving wheel events. */
+html.is-locked, html.is-locked body { overflow: hidden; }
 .store::backdrop { background: rgba(0, 18, 18, 0.55); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); }
 .store[open] { animation: storeIn .4s cubic-bezier(.2,.8,.2,1); }
 @keyframes storeIn { from { transform: translateY(24px) scale(.97); opacity: 0; } to { transform: none; opacity: 1; } }
@@ -903,14 +909,26 @@ p { margin: 0; }
     }
     if (typeof storeDialog.showModal === 'function') { if (!storeDialog.open) storeDialog.showModal(); }
     else storeDialog.setAttribute('open', '');
+    lockScroll(true);
   }
-  function closeStore() { clearTimeout(redirectTimer); if (storeDialog.open) storeDialog.close(); else storeDialog.removeAttribute('open'); }
+  function closeStore() { clearTimeout(redirectTimer); if (storeDialog.open) storeDialog.close(); else storeDialog.removeAttribute('open'); lockScroll(false); }
+  /* Lenis is created later in this script and stored on window.__lenis, so the
+     lock can pause it as well as the native scroll. */
+  function lockScroll(on) {
+    document.documentElement.classList.toggle('is-locked', on);
+    var l = window.__lenis;
+    if (l) { if (on) l.stop(); else l.start(); }
+  }
   document.querySelectorAll('[data-store]').forEach(function (a) {
     a.addEventListener('click', function (e) { e.preventDefault(); openStore(a.dataset.storePlatform || null); });
   });
   document.querySelectorAll('[data-store-close]').forEach(function (b) { b.addEventListener('click', closeStore); });
   storeDialog.addEventListener('click', function (e) { if (e.target === storeDialog) closeStore(); });
-  storeDialog.addEventListener('close', function () { clearTimeout(redirectTimer); });
+  storeDialog.addEventListener('close', function () { clearTimeout(redirectTimer); lockScroll(false); });
+  // Wheel and touch moves on the backdrop must not reach the page.
+  ['wheel', 'touchmove'].forEach(function (ev) {
+    storeDialog.addEventListener(ev, function (e) { if (!e.target.closest('.store__inner')) e.preventDefault(); }, { passive: false });
+  });
 
   /* Spotlight on bento tiles */
   document.querySelectorAll('.tile').forEach(function (tile) {
@@ -953,6 +971,7 @@ p { margin: 0; }
   var lenis = null;
   if (typeof window.Lenis !== 'undefined') {
     lenis = new Lenis({ lerp: 0.09, smoothWheel: true });
+    window.__lenis = lenis;
     lenis.on('scroll', function (e) { ScrollTrigger.update(); onScrollPos(e.scroll); });
     gsap.ticker.add(function (time) { lenis.raf(time * 1000); });
     gsap.ticker.lagSmoothing(0);
