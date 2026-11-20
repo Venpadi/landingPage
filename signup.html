@@ -327,11 +327,11 @@ p { margin: 0; }
      the form explains that verification is not reachable rather than
      pretending a code was sent.
      ------------------------------------------------------------------ */
-  var API_BASE = '';
+  var API_BASE = 'https://venpadi-production.up.railway.app/api';
 
-  // Local testing against a laptop API: http://localhost:8081 is already in
-  // the API's development CORS allowlist, so a page served from there works.
-  if (!API_BASE && /^(localhost|127\.0\.0\.1)$/.test(location.hostname)) {
+  // Served from a laptop, talk to a local API instead: http://localhost:8081
+  // is already in the API's development CORS allowlist.
+  if (/^(localhost|127\.0\.0\.1)$/.test(location.hostname)) {
     API_BASE = 'http://localhost:3000/api';
   }
 
