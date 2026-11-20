@@ -1,0 +1,502 @@
+<!doctype html>
+<html lang="en-NG">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Get started — Venpadi</title>
+<meta name="description" content="Create your Venpadi account or sign in. We verify your phone number with a 4-digit code sent by SMS from VENPADI before the account is created." />
+<meta name="theme-color" content="#540298" />
+<meta name="color-scheme" content="light" />
+<meta name="robots" content="index,follow" />
+<link rel="icon" type="image/svg+xml" href="assets/figma/logo-mark-sm.svg" />
+<link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32.png" />
+<link rel="icon" type="image/png" sizes="512x512" href="assets/icon-512.png" />
+<link rel="apple-touch-icon" sizes="180x180" href="assets/apple-touch-icon.png" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,600;12..96,700;12..96,800&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+<style>
+/* ---------- Tokens: lifted from frontend/src/design/venpadi/tokens.ts ---------- */
+:root {
+  --bg: #F9F9F9;
+  --card: #FFFFFF;
+  --hairline: #F0F0F0;
+  --ink: #001212;
+  --sub: #5C5961;
+  --brand: #540298;
+  --brand-deep: #47087F;
+  --brand-dark: #440279;
+  --yellow: #EED751;
+  --yellow-deep: #D2BA31;
+  --green-deep: #0D7747;
+  --green-tint: #E7F7EE;
+  --tile-purple: #EEEEFA;
+  --amber-text: #7A5205;
+  --amber-bg: #FEF1CC;
+  --owing: #C0392B;
+  --owing-bg: #FEF2F2;
+  --ok: #218C54;
+  --ok-bg: #E5F5EB;
+  --neutral: #F2F2F2;
+  --wash-1: #EFE4F6;
+  --wash-2: #F6F0F6;
+  --wash-3: #FCFBF9;
+
+  --r-card: 14px;
+  --r-button: 16px;
+  --r-input: 12px;
+  --r-pill: 100px;
+
+  --display: "Bricolage Grotesque", "SF Pro Display", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --body: "Manrope", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+
+  --max: 1120px;
+  --gutter: clamp(16px, 4vw, 40px);
+  --nav-h: 72px;
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+html, body { overflow-x: clip; }
+body {
+  margin: 0; background: var(--bg); color: var(--ink);
+  font-family: var(--body); font-size: 17px; line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+}
+img { display: block; max-width: 100%; }
+a { color: inherit; text-decoration: none; }
+button, input { font: inherit; color: inherit; }
+:focus-visible { outline: 3px solid var(--yellow); outline-offset: 3px; border-radius: 6px; }
+h1, h2, h3 { font-family: var(--display); letter-spacing: -0.02em; margin: 0; font-weight: 700; line-height: 1.04; text-wrap: balance; }
+p { margin: 0; }
+.container { width: min(var(--max), 100% - 2 * var(--gutter)); margin-inline: auto; }
+.sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+/* ---------- Nav ---------- */
+.nav { position: sticky; top: 0; z-index: 20; height: var(--nav-h); display: flex; align-items: center; background: rgba(249,249,249,0.86); backdrop-filter: saturate(160%) blur(16px); -webkit-backdrop-filter: saturate(160%) blur(16px); box-shadow: 0 1px 0 rgba(0,18,18,0.06); }
+.nav__inner { display: flex; align-items: center; justify-content: space-between; gap: 20px; }
+.brand { display: inline-flex; align-items: center; gap: 10px; font-family: var(--display); font-weight: 700; font-size: 22px; letter-spacing: -0.03em; }
+.brand img { width: 28px; height: 27px; }
+.nav__right { display: flex; align-items: center; gap: 8px; }
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: 10px; height: 56px; padding: 0 26px; border-radius: var(--r-button); border: 0; cursor: pointer; font-weight: 700; font-size: 16px; letter-spacing: -0.01em; white-space: nowrap; transition: transform .25s cubic-bezier(.2,.8,.2,1), box-shadow .25s, background-color .25s; }
+.btn--primary { background: var(--brand); color: #fff; box-shadow: 0 10px 30px -10px rgba(84,2,152,.55); }
+.btn--primary:hover:not(:disabled) { transform: translateY(-2px); background: var(--brand-dark); }
+.btn--primary:disabled { opacity: .55; cursor: not-allowed; box-shadow: none; }
+.btn--ghost { background: rgba(84,2,152,0.06); color: var(--brand-dark); }
+.btn--ghost:hover { background: rgba(84,2,152,0.11); }
+.btn--sm { height: 44px; padding: 0 18px; font-size: 15px; border-radius: var(--r-pill); }
+.btn--block { width: 100%; }
+
+/* ---------- Page ---------- */
+.wash { background: linear-gradient(180deg, var(--wash-1) 0%, var(--wash-2) 40%, var(--wash-3) 75%, var(--bg) 100%); padding: clamp(40px, 7vw, 76px) 0 clamp(48px, 8vw, 96px); }
+.head { max-width: 640px; }
+.kicker { display: inline-flex; align-items: center; gap: 10px; font-weight: 800; font-size: 13px; letter-spacing: .14em; text-transform: uppercase; color: var(--brand-dark); }
+.kicker::before { content: ""; width: 10px; height: 10px; border-radius: 3px; background: var(--yellow); transform: rotate(45deg); }
+.h1 { margin-top: 16px; font-size: clamp(34px, 5.4vw, 60px); font-weight: 800; letter-spacing: -0.04em; }
+.lede { margin-top: 18px; color: var(--sub); font-size: clamp(16px, 1.3vw, 19px); max-width: 56ch; }
+
+.grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: clamp(24px, 4vw, 56px); align-items: start; margin-top: clamp(32px, 5vw, 56px); }
+
+/* ---------- Auth card ---------- */
+.card { background: var(--card); border: 1px solid rgba(0,18,18,0.07); border-radius: 28px; padding: clamp(22px, 3.5vw, 36px); box-shadow: 0 30px 60px -40px rgba(28,0,52,0.35); }
+.tabs { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; padding: 5px; background: var(--neutral); border-radius: var(--r-pill); }
+.tab { height: 44px; border: 0; border-radius: var(--r-pill); background: transparent; font-weight: 700; font-size: 15px; cursor: pointer; color: var(--sub); transition: background-color .25s, color .25s; }
+.tab[aria-selected="true"] { background: var(--card); color: var(--brand-dark); box-shadow: 0 1px 3px rgba(0,18,18,.12); }
+
+.step { margin-top: 24px; }
+.step[hidden] { display: none; }
+.step__label { font-weight: 800; font-size: 12px; letter-spacing: .12em; text-transform: uppercase; color: var(--brand-dark); }
+.step h2 { margin-top: 8px; font-size: 24px; font-weight: 800; letter-spacing: -0.03em; }
+.step__hint { margin-top: 10px; color: var(--sub); font-size: 15px; }
+
+.field { margin-top: 20px; }
+.field > label { display: block; font-weight: 700; font-size: 14px; margin-bottom: 8px; }
+.phone { display: flex; align-items: stretch; gap: 8px; }
+.phone__prefix { display: flex; align-items: center; gap: 8px; padding: 0 14px; border-radius: var(--r-input); background: var(--neutral); font-weight: 700; white-space: nowrap; }
+.phone__prefix img { width: 20px; height: 14px; border-radius: 2px; }
+.input { flex: 1; min-width: 0; height: 56px; padding: 0 16px; border-radius: var(--r-input); border: 1px solid rgba(0,0,0,0.12); background: #FCFCFC; font-size: 17px; font-weight: 600; }
+.input:focus { border-color: var(--brand); background: #fff; }
+.input--code { width: 100%; text-align: center; font-family: var(--display); font-size: 32px; font-weight: 800; letter-spacing: .5em; text-indent: .5em; height: 68px; }
+
+.note { margin-top: 16px; padding: 12px 14px; border-radius: var(--r-card); font-size: 14px; font-weight: 600; }
+.note--info { background: var(--tile-purple); color: var(--brand-dark); }
+.note--error { background: var(--owing-bg); color: var(--owing); }
+.note--ok { background: var(--ok-bg); color: var(--ok); }
+.note[hidden] { display: none; }
+
+.actions { margin-top: 20px; display: grid; gap: 10px; }
+.linkrow { margin-top: 14px; display: flex; flex-wrap: wrap; gap: 14px; align-items: center; justify-content: space-between; font-size: 14px; font-weight: 600; color: var(--sub); }
+.linkbtn { background: none; border: 0; padding: 0; cursor: pointer; color: var(--brand-dark); font-weight: 700; text-decoration: underline; text-underline-offset: 3px; }
+.linkbtn:disabled { color: var(--sub); text-decoration: none; cursor: default; }
+
+.done { text-align: center; padding: 8px 0; }
+.done__mark { width: 64px; height: 64px; margin: 0 auto 16px; border-radius: 50%; background: var(--ok-bg); color: var(--ok); display: grid; place-items: center; font-size: 30px; font-weight: 800; }
+
+/* ---------- Explainer ---------- */
+.panel { background: var(--card); border: 1px solid rgba(0,18,18,0.07); border-radius: 28px; padding: clamp(22px, 3.5vw, 36px); }
+.panel + .panel { margin-top: 16px; }
+.panel h2 { font-size: clamp(22px, 2.4vw, 28px); font-weight: 800; letter-spacing: -0.03em; }
+.panel p { margin-top: 12px; color: var(--sub); font-size: 15.5px; }
+.stages { list-style: none; margin: 20px 0 0; padding: 0; display: grid; gap: 12px; counter-reset: s; }
+.stages li { display: flex; gap: 14px; padding: 16px; border-radius: var(--r-card); background: var(--bg); }
+.stages li::before { counter-increment: s; content: counter(s); flex: none; width: 30px; height: 30px; border-radius: 50%; background: var(--brand); color: #fff; font-family: var(--display); font-weight: 800; font-size: 15px; display: grid; place-items: center; }
+.stages b { display: block; font-weight: 800; }
+.stages span { color: var(--sub); font-size: 14.5px; }
+.sms { margin-top: 20px; padding: 18px; border-radius: var(--r-card); background: var(--brand); color: #fff; }
+.sms__from { font-size: 12px; font-weight: 800; letter-spacing: .12em; text-transform: uppercase; color: var(--yellow); }
+.sms__body { margin-top: 8px; font-size: 16px; font-weight: 600; line-height: 1.5; }
+.facts { list-style: none; margin: 18px 0 0; padding: 0; display: grid; gap: 8px; font-size: 14.5px; font-weight: 600; color: var(--sub); }
+.facts li { display: flex; gap: 10px; }
+.facts li::before { content: "•"; color: var(--yellow-deep); font-weight: 800; }
+.never { margin-top: 18px; padding: 14px 16px; border-radius: var(--r-card); background: var(--amber-bg); color: var(--amber-text); font-weight: 700; font-size: 14.5px; }
+
+/* ---------- Contact / footer ---------- */
+.contact dl { margin: 18px 0 0; display: grid; gap: 14px; }
+.contact dt { font-weight: 800; font-size: 12px; letter-spacing: .12em; text-transform: uppercase; color: var(--brand-dark); }
+.contact dd { margin: 4px 0 0; color: var(--sub); font-size: 15.5px; font-style: normal; }
+.contact a { color: var(--brand-dark); font-weight: 700; text-decoration: underline; text-underline-offset: 3px; }
+.footer { padding: 40px 0; display: flex; flex-wrap: wrap; gap: 16px; align-items: center; justify-content: space-between; color: var(--sub); font-size: 14.5px; }
+.footer__links { display: flex; flex-wrap: wrap; gap: 18px; list-style: none; margin: 0; padding: 0; font-weight: 600; }
+
+@media (max-width: 900px) {
+  .grid { grid-template-columns: 1fr; }
+  .nav__right .btn--ghost { display: none; }
+}
+@media (prefers-reduced-motion: reduce) { .btn { transition: none; } }
+</style>
+</head>
+<body>
+
+<header class="nav">
+  <div class="container nav__inner">
+    <a class="brand" href="index.html" aria-label="Venpadi home"><img src="assets/figma/logo-mark-sm.svg" alt="" width="28" height="27" />Venpadi</a>
+    <div class="nav__right">
+      <a class="btn btn--ghost btn--sm" href="index.html">Back to home</a>
+      <a class="btn btn--primary btn--sm" href="#start">Get started</a>
+    </div>
+  </div>
+</header>
+
+<main class="wash">
+  <div class="container">
+    <div class="head">
+      <p class="kicker">Sign in or get started</p>
+      <h1 class="h1" id="start">Verify your phone number.</h1>
+      <p class="lede">Venpadi accounts are tied to your phone number. We send you a <strong>4-digit code by SMS from VENPADI</strong>, you enter it here, and your number is verified. This is the only step where Venpadi sends you a text.</p>
+    </div>
+
+    <div class="grid">
+      <!-- ===================== AUTH CARD ===================== -->
+      <section class="card" aria-labelledby="card-title">
+        <h2 class="sr-only" id="card-title">Create your account or log in</h2>
+
+        <div class="tabs" role="tablist" aria-label="Create an account or log in">
+          <button class="tab" type="button" role="tab" id="tab-signup" aria-selected="true" aria-controls="panel-auth">Create account</button>
+          <button class="tab" type="button" role="tab" id="tab-login" aria-selected="false" aria-controls="panel-auth">Log in</button>
+        </div>
+
+        <div id="panel-auth" role="tabpanel" aria-labelledby="tab-signup">
+
+          <noscript>
+            <p class="note note--error" style="display:block">Phone verification needs JavaScript. Turn it on, or install the Venpadi app and verify your number there.</p>
+          </noscript>
+
+          <!-- Step 1: phone number -->
+          <form class="step" id="step-phone" method="post" action="#" novalidate>
+            <p class="step__label">Step 1 of 2</p>
+            <h2 id="phone-title">Enter your phone number</h2>
+            <p class="step__hint" id="phone-hint">We'll text you a 4-digit code to confirm this number is yours.</p>
+
+            <div class="field">
+              <label for="phone">Phone number</label>
+              <div class="phone">
+                <span class="phone__prefix"><img src="assets/figma/flag-ng.svg" alt="Nigeria" width="20" height="14" />+234</span>
+                <input class="input" id="phone" name="phone" type="tel" inputmode="numeric" autocomplete="tel-national"
+                       placeholder="801 234 5678" maxlength="11" aria-describedby="phone-help" required />
+              </div>
+              <p class="step__hint" id="phone-help">Your Nigerian mobile number without the leading zero, for example 8012345678.</p>
+            </div>
+
+            <p class="note note--error" id="phone-error" role="alert" hidden></p>
+
+            <div class="actions">
+              <button class="btn btn--primary btn--block" type="submit" id="send-code">Send me the code</button>
+            </div>
+            <p class="step__hint" style="margin-top:14px">By continuing you agree to receive one verification SMS from VENPADI at this number. Standard carrier rates may apply.</p>
+          </form>
+
+          <!-- Step 2: OTP -->
+          <form class="step" id="step-code" method="post" action="#" novalidate hidden>
+            <p class="step__label">Step 2 of 2</p>
+            <h2>Enter the 4-digit code</h2>
+            <p class="step__hint">We sent it by SMS from <strong>VENPADI</strong> to <strong id="code-target">your number</strong>. It expires in 5 minutes.</p>
+
+            <div class="field">
+              <label for="code">Verification code</label>
+              <input class="input input--code" id="code" name="code" type="text" inputmode="numeric" autocomplete="one-time-code"
+                     pattern="[0-9]{4}" maxlength="4" placeholder="····" required />
+            </div>
+
+            <p class="note note--error" id="code-error" role="alert" hidden></p>
+
+            <div class="actions">
+              <button class="btn btn--primary btn--block" type="submit" id="verify-code">Verify my number</button>
+            </div>
+            <p class="linkrow">
+              <button class="linkbtn" type="button" id="resend">Resend the code</button>
+              <button class="linkbtn" type="button" id="change-phone">Use a different number</button>
+            </p>
+          </form>
+
+          <!-- Step 3: verified -->
+          <div class="step done" id="step-done" hidden>
+            <div class="done__mark" aria-hidden="true">✓</div>
+            <h2 id="done-title">Your number is verified</h2>
+            <p class="step__hint" id="done-text">Now install Venpadi on your phone and sign in with this number. You'll choose a 4-digit PIN that unlocks the app, even with no network.</p>
+            <div class="actions">
+              <a class="btn btn--primary btn--block" href="index.html#get-the-app">Get the app</a>
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- ===================== OTP EXPLAINER ===================== -->
+      <div>
+        <section class="panel" aria-labelledby="otp-title">
+          <h2 id="otp-title">When Venpadi sends you an SMS</h2>
+          <p>Venpadi uses SMS for one thing only: proving that a phone number belongs to the person using it. Verification is required at these stages, and nowhere else.</p>
+          <ol class="stages">
+            <li><div><b>Creating an account</b><span>You enter your number on this page or in the app, we text a 4-digit code, and the account is only created once that code checks out.</span></div></li>
+            <li><div><b>Signing in on a new phone</b><span>Changing or replacing your phone means proving the number is still yours, so a fresh code is sent before your records are restored.</span></div></li>
+            <li><div><b>Recovering access</b><span>After too many wrong PIN attempts the app stops deciding locally and asks for a code instead.</span></div></li>
+          </ol>
+
+          <div class="sms">
+            <p class="sms__from">Sender ID: VENPADI</p>
+            <p class="sms__body">Your Venpadi code is 1234. It expires in 5 minutes. Do not share it with anyone.</p>
+          </div>
+
+          <ul class="facts">
+            <li>The code is 4 digits and expires 5 minutes after it is sent.</li>
+            <li>One code per number per minute, and at most 5 per hour.</li>
+            <li>Five wrong attempts close the code; you request a new one.</li>
+            <li>Codes are stored only as hashes and are never shown to our staff.</li>
+          </ul>
+
+          <p class="never">Venpadi never sends marketing or promotional SMS, and never texts your customers. Debt reminders stay inside the app, on your own screen.</p>
+        </section>
+
+        <section class="panel contact" id="contact" aria-labelledby="contact-title">
+          <h2 id="contact-title">Contact Venpadi</h2>
+          <p>Venpadi is a record-keeping app for Nigerian vendors. It keeps records only and does not move money.</p>
+          <!-- TERMII / CONTACT DETAILS — fill these in before resubmitting the Sender ID request. -->
+          <dl>
+            <dt>Registered address</dt>
+            <dd id="addr-line"><address data-fill="address">Add your full street address, city and state here</address></dd>
+            <dt>Email</dt>
+            <dd><a data-fill="email" href="#">Add your support email here</a></dd>
+            <dt>Phone</dt>
+            <dd><a data-fill="phone" href="#">Add your support phone number here</a></dd>
+          </dl>
+        </section>
+      </div>
+    </div>
+  </div>
+</main>
+
+<footer class="container footer">
+  <a class="brand" href="index.html" style="font-size:19px"><img src="assets/figma/logo-mark-sm.svg" alt="" width="24" height="23" />Venpadi</a>
+  <ul class="footer__links">
+    <li><a href="index.html">Home</a></li>
+    <li><a href="#start">Get started</a></li>
+    <li><a href="#otp-title">SMS and verification</a></li>
+    <li><a href="#contact">Contact</a></li>
+  </ul>
+  <p>Vendors padi. Records for Nigerian vendors. © 2026 Venpadi</p>
+</footer>
+
+<script>
+(function () {
+  'use strict';
+
+  /* ------------------------------------------------------------------
+     API_BASE: the Venpadi API this form talks to, without a trailing
+     slash, e.g. "https://api.venpadi.com/api". It must be an https
+     origin that is listed in the API's CORS_ORIGINS. While it is empty
+     the form explains that verification is not reachable rather than
+     pretending a code was sent.
+     ------------------------------------------------------------------ */
+  var API_BASE = '';
+
+  // Local testing against a laptop API: http://localhost:8081 is already in
+  // the API's development CORS allowlist, so a page served from there works.
+  if (!API_BASE && /^(localhost|127\.0\.0\.1)$/.test(location.hostname)) {
+    API_BASE = 'http://localhost:3000/api';
+  }
+
+  var purpose = 'signup';
+  var fullPhone = '';
+  var cooldownTimer = null;
+
+  var el = function (id) { return document.getElementById(id); };
+  var tabSignup = el('tab-signup'), tabLogin = el('tab-login');
+  var stepPhone = el('step-phone'), stepCode = el('step-code'), stepDone = el('step-done');
+  var phoneInput = el('phone'), codeInput = el('code');
+  var phoneError = el('phone-error'), codeError = el('code-error');
+  var sendBtn = el('send-code'), verifyBtn = el('verify-code'), resendBtn = el('resend');
+
+  function show(node, visible) { node.hidden = !visible; }
+  function setError(node, message) {
+    if (!message) { show(node, false); node.textContent = ''; return; }
+    node.textContent = message; show(node, true);
+  }
+
+  /* Digits only, and keep the display readable: 801 234 5678 */
+  phoneInput.addEventListener('input', function () {
+    var d = phoneInput.value.replace(/\D/g, '').replace(/^0+/, '').slice(0, 10);
+    phoneInput.value = d.replace(/^(\d{3})(\d{0,3})(\d{0,4}).*$/, function (_, a, b, c) {
+      return [a, b, c].filter(Boolean).join(' ');
+    });
+  });
+  codeInput.addEventListener('input', function () {
+    codeInput.value = codeInput.value.replace(/\D/g, '').slice(0, 4);
+  });
+
+  function digits() { return phoneInput.value.replace(/\D/g, ''); }
+  /* The API accepts +234 followed by 7, 8 or 9 and nine more digits. */
+  function toE164(d) { return '+234' + d; }
+  function valid(d) { return /^[789]\d{9}$/.test(d); }
+  function pretty(d) { return '+234 ' + d.slice(0, 3) + ' ' + d.slice(3, 6) + ' ' + d.slice(6); }
+
+  function setMode(next) {
+    purpose = next;
+    var creating = next === 'signup';
+    tabSignup.setAttribute('aria-selected', String(creating));
+    tabLogin.setAttribute('aria-selected', String(!creating));
+    el('phone-title').textContent = creating ? 'Enter your phone number' : 'Log in with your phone number';
+    el('phone-hint').textContent = creating
+      ? "We'll text you a 4-digit code to confirm this number is yours."
+      : "We'll text you a 4-digit code to confirm it's really you.";
+    el('done-title').textContent = creating ? 'Your number is verified' : 'Welcome back';
+    el('done-text').textContent = creating
+      ? "Now install Venpadi on your phone and sign in with this number. You'll choose a 4-digit PIN that unlocks the app, even with no network."
+      : 'Open Venpadi on your phone and enter your PIN. Your records are restored from your account.';
+    goTo('phone');
+    setError(phoneError, '');
+    setError(codeError, '');
+  }
+  tabSignup.addEventListener('click', function () { setMode('signup'); });
+  tabLogin.addEventListener('click', function () { setMode('login'); });
+
+  function goTo(step) {
+    show(stepPhone, step === 'phone');
+    show(stepCode, step === 'code');
+    show(stepDone, step === 'done');
+  }
+
+  /* Posts JSON and turns the API's error shape into one readable line. */
+  function post(path, body) {
+    if (!API_BASE) {
+      return Promise.reject(new Error(
+        'Phone verification is not available on this page yet. Install the Venpadi app and sign up there, or contact us using the details on this page.'
+      ));
+    }
+    return fetch(API_BASE + path, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+      body: JSON.stringify(body)
+    }).then(function (res) {
+      return res.json().catch(function () { return null; }).then(function (data) {
+        if (res.ok) return data || {};
+        var msg = data && data.message;
+        if (Array.isArray(msg)) msg = msg[0];
+        if (res.status === 429) msg = msg || 'Too many attempts. Wait a minute and try again.';
+        throw new Error(msg || 'Something went wrong. Please try again.');
+      });
+    }, function () {
+      throw new Error('We could not reach Venpadi. Check your connection and try again.');
+    });
+  }
+
+  function cooldown(seconds) {
+    clearInterval(cooldownTimer);
+    var left = seconds;
+    resendBtn.disabled = true;
+    resendBtn.textContent = 'Resend the code in ' + left + 's';
+    cooldownTimer = setInterval(function () {
+      left -= 1;
+      if (left <= 0) {
+        clearInterval(cooldownTimer);
+        resendBtn.disabled = false;
+        resendBtn.textContent = 'Resend the code';
+        return;
+      }
+      resendBtn.textContent = 'Resend the code in ' + left + 's';
+    }, 1000);
+  }
+
+  function requestCode(button) {
+    var d = digits();
+    if (!valid(d)) {
+      setError(phoneError, 'Enter a Nigerian mobile number: 10 digits starting with 7, 8 or 9.');
+      phoneInput.focus();
+      return;
+    }
+    fullPhone = toE164(d);
+    setError(phoneError, '');
+    button.disabled = true;
+    var label = button.textContent;
+    button.textContent = 'Sending…';
+    post('/auth/otp/request', { phone: fullPhone, purpose: purpose })
+      .then(function () {
+        el('code-target').textContent = pretty(d);
+        goTo('code');
+        codeInput.value = '';
+        codeInput.focus();
+        cooldown(60); // the API allows one code per number per minute
+      })
+      .catch(function (err) { setError(phoneError, err.message); })
+      .then(function () { button.disabled = false; button.textContent = label; });
+  }
+
+  stepPhone.addEventListener('submit', function (e) { e.preventDefault(); requestCode(sendBtn); });
+  el('change-phone').addEventListener('click', function () { goTo('phone'); phoneInput.focus(); });
+  resendBtn.addEventListener('click', function () {
+    setError(codeError, '');
+    resendBtn.disabled = true;
+    post('/auth/otp/request', { phone: fullPhone, purpose: purpose })
+      .then(function () { cooldown(60); })
+      .catch(function (err) { setError(codeError, err.message); resendBtn.disabled = false; });
+  });
+
+  stepCode.addEventListener('submit', function (e) {
+    e.preventDefault();
+    var code = codeInput.value.replace(/\D/g, '');
+    if (code.length !== 4) {
+      setError(codeError, 'Enter the 4-digit code from the SMS.');
+      codeInput.focus();
+      return;
+    }
+    setError(codeError, '');
+    verifyBtn.disabled = true;
+    verifyBtn.textContent = 'Checking…';
+    post('/auth/otp/verify', { phone: fullPhone, purpose: purpose, code: code })
+      .then(function () { clearInterval(cooldownTimer); goTo('done'); el('done-title').focus(); })
+      .catch(function (err) { setError(codeError, err.message); })
+      .then(function () { verifyBtn.disabled = false; verifyBtn.textContent = 'Verify my number'; });
+  });
+
+  /* #login opens the log-in tab. Also on hashchange, because arriving from a
+     link on this same page is a same-document navigation: the script does not
+     run again, so without this the tab would not switch. */
+  function fromHash() {
+    if (location.hash === '#login') setMode('login');
+    else if (location.hash === '#signup') setMode('signup');
+  }
+  window.addEventListener('hashchange', fromHash);
+  fromHash();
+})();
+</script>
+</body>
+</html>

@@ -122,6 +122,7 @@ p { margin: 0; }
 .nav__links { display: flex; gap: 6px; list-style: none; margin: 0; padding: 0; }
 .nav__links a { padding: 8px 14px; border-radius: var(--r-pill); font-weight: 600; font-size: 15px; color: var(--sub); transition: color .2s, background-color .2s; }
 .nav__links a:hover { color: var(--ink); background: rgba(84, 2, 152, 0.07); }
+.nav__cta { display: flex; align-items: center; gap: 8px; }
 .btn {
   display: inline-flex; align-items: center; justify-content: center; gap: 10px;
   height: 56px; padding: 0 26px; border-radius: var(--r-button); border: 0; cursor: pointer;
@@ -457,6 +458,9 @@ p { margin: 0; }
 .footer { padding: 48px 0 40px; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 16px; color: var(--sub); font-size: 14.5px; }
 .footer__links { display: flex; flex-wrap: wrap; gap: 18px; list-style: none; margin: 0; padding: 0; font-weight: 600; }
 .footer__links a:hover { color: var(--ink); }
+.footer__contact { font-size: 14px; line-height: 1.6; }
+.footer__contact address { font-style: normal; }
+.footer__contact a { color: var(--brand-dark); font-weight: 600; text-decoration: underline; text-underline-offset: 3px; }
 
 /* ---------- Platform line + final note ---------- */
 .platforms { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-top: 26px; font-size: 14.5px; font-weight: 600; color: var(--sub); }
@@ -553,9 +557,13 @@ html.is-locked, html.is-locked body { overflow: hidden; }
         <li><a href="#health">Business Health</a></li>
         <li><a href="#shop">Online shop</a></li>
         <li><a href="#faq">FAQ</a></li>
+        <li><a href="signup.html#contact">Contact</a></li>
       </ul>
     </nav>
-    <a class="btn btn--primary btn--sm" href="#get-the-app" data-store>Get the app</a>
+    <div class="nav__cta">
+      <a class="btn btn--ghost btn--sm" href="signup.html#login">Log in</a>
+      <a class="btn btn--primary btn--sm" href="signup.html">Get started</a>
+    </div>
   </div>
 </header>
 
@@ -575,7 +583,7 @@ html.is-locked, html.is-locked body { overflow: hidden; }
         </h1>
         <p class="lede" data-hero>Venpadi is the record book for Nigerian vendors. <strong>Sales, spending, debtors and stock in one place,</strong> saved on your phone first and synced when network comes back.</p>
         <div class="cta-row" data-hero>
-          <a class="btn btn--primary" href="#get-the-app" data-store>Get the app<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+          <a class="btn btn--primary" href="signup.html">Get started<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
           <a class="btn btn--ghost" href="#records" data-scroll>See it work</a>
         </div>
         <ul class="facts" data-hero>
@@ -583,7 +591,7 @@ html.is-locked, html.is-locked body { overflow: hidden; }
           <li><b>0</b> bars needed to save</li>
           <li><b>₦</b> exact to the kobo</li>
         </ul>
-        <p class="platforms" data-hero><span class="platforms__dot"></span>A phone app for Android and iPhone. <a href="#get-the-app" data-store>Already a vendor? Open it on your phone.</a></p>
+        <p class="platforms" data-hero><span class="platforms__dot"></span>A phone app for Android and iPhone. We verify your number with one SMS. <a href="signup.html#login">Already a vendor? Log in.</a></p>
       </div>
 
       <div class="phone-col">
@@ -782,7 +790,8 @@ html.is-locked, html.is-locked body { overflow: hidden; }
         <details><summary>What if I record something by mistake?</summary><p>You reverse it with a reason. The record stays in the list with a reversed mark, so your history stays complete and your totals stay honest.</p></details>
         <details><summary>Will my customers get SMS or WhatsApp reminders?</summary><p>No. Reminders about overdue debts appear inside the app, for you. Venpadi never messages your customers.</p></details>
         <details><summary>Is Business Health a credit score?</summary><p>No. It measures how complete your record keeping is, across four habits with fixed weights. It is recomputed every night and a fresh account has no score at all until the first sale.</p></details>
-        <details><summary>Is there a web version I can log in to?</summary><p>No. Venpadi is a phone app for Android and iPhone; there is no web login. The only web part in the design is the online shop, a storefront page for your buyers, and that is not built yet.</p></details>
+        <details><summary>Where does phone verification happen?</summary><p>When you create an account and when you sign in on a new phone. Venpadi texts you a 4-digit code from the sender ID VENPADI, and the code expires in 5 minutes. You can do it <a href="signup.html" style="color:var(--brand-dark);text-decoration:underline;text-underline-offset:3px">on this site</a> or in the app. Venpadi sends no other SMS, and never texts your customers.</p></details>
+        <details><summary>Is Venpadi a web app?</summary><p>No. Keeping records happens in the phone app for Android and iPhone. The website is for getting started, verifying your number and, soon, the online shop your buyers will browse.</p></details>
         <details><summary>Is there an online shop?</summary><p>Not yet. An online shop is in the Venpadi design and is the next thing being built, but it is not in the app today. Like everything else in Venpadi, it will keep records only and will not take payments.</p></details>
         <details><summary>What if I lose my phone?</summary><p>Log in on another phone with your number and PIN. Everything that reached your account syncs back. The first login on a new phone needs network.</p></details>
       </div>
@@ -797,10 +806,10 @@ html.is-locked, html.is-locked body { overflow: hidden; }
       <h2 class="h2" id="final-title" data-reveal>Start your records <em>today.</em></h2>
       <p class="sub" data-reveal>Venpadi lives on your phone. Install it from Google Play or the App Store, sign up with your phone number and a 4-digit PIN, and you're recording. The first login needs network; after that, your PIN opens the app anywhere.</p>
       <div class="cta-row" data-reveal>
-        <a class="btn btn--yellow" href="#get-the-app" data-store data-store-platform="android">Get it on Google Play</a>
-        <a class="btn btn--ghost" style="background: rgba(255,255,255,0.1); color: #fff;" href="#get-the-app" data-store data-store-platform="ios">Download on the App Store</a>
+        <a class="btn btn--yellow" href="signup.html">Create your account</a>
+        <a class="btn btn--ghost" style="background: rgba(255,255,255,0.1); color: #fff;" href="#get-the-app" data-store>Get the app</a>
       </div>
-      <p class="final__note" data-reveal>Already a vendor? There is no web login. Open the Venpadi app on your phone.</p>
+      <p class="final__note" data-reveal>Already a vendor? <a href="signup.html#login" style="color:var(--yellow);text-decoration:underline;text-underline-offset:3px">Log in</a> to verify your number, then open the app on your phone.</p>
     </div>
     <div class="final__phone" aria-hidden="true"><img src="assets/screens/home-revealed.jpg" alt="" width="780" height="1688" loading="lazy" /></div>
   </section>
@@ -814,8 +823,15 @@ html.is-locked, html.is-locked body { overflow: hidden; }
       <li><a href="#health">Business Health</a></li>
       <li><a href="#shop">Online shop</a></li>
       <li><a href="#faq">FAQ</a></li>
+      <li><a href="signup.html">Get started</a></li>
+      <li><a href="signup.html#login">Log in</a></li>
     </ul>
-    <p>Vendors padi. Records for Nigerian vendors. © 2026 Venpadi</p>
+    <div class="footer__contact">
+      <!-- TERMII / CONTACT DETAILS — fill these in before resubmitting the Sender ID request. -->
+      <address data-fill="address">Add your full street address, city and state here</address>
+      <p><a data-fill="email" href="#">Add your support email here</a> · <a data-fill="phone" href="#">Add your support phone number here</a></p>
+      <p>Vendors padi. Records for Nigerian vendors. © 2026 Venpadi</p>
+    </div>
   </footer>
 </main>
 
