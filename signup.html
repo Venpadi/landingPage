@@ -290,14 +290,13 @@ p { margin: 0; }
         <section class="panel contact" id="contact" aria-labelledby="contact-title">
           <h2 id="contact-title">Contact Venpadi</h2>
           <p>Venpadi is a record-keeping app for Nigerian vendors. It keeps records only and does not move money.</p>
-          <!-- TERMII / CONTACT DETAILS — fill these in before resubmitting the Sender ID request. -->
           <dl>
             <dt>Registered address</dt>
-            <dd id="addr-line"><address data-fill="address">Add your full street address, city and state here</address></dd>
+            <dd><address>15a Farayola Street, Alapere, Ketu, Lagos, Nigeria</address></dd>
             <dt>Email</dt>
-            <dd><a data-fill="email" href="#">Add your support email here</a></dd>
+            <dd><a href="mailto:support@thevenpadi.com">support@thevenpadi.com</a></dd>
             <dt>Phone</dt>
-            <dd><a data-fill="phone" href="#">Add your support phone number here</a></dd>
+            <dd><a href="tel:+2349041332142">0904 133 2142</a></dd>
           </dl>
         </section>
       </div>
@@ -412,6 +411,13 @@ p { margin: 0; }
         var msg = data && data.message;
         if (Array.isArray(msg)) msg = msg[0];
         if (res.status === 429) msg = msg || 'Too many attempts. Wait a minute and try again.';
+        // 503 is the API telling us the SMS provider refused the message. Say so
+        // plainly and leave a route forward, rather than a bare "try again".
+        if (res.status === 503) {
+          msg = (msg || 'We could not send your code.') +
+            ' Our SMS sender ID is still being activated with our network provider. ' +
+            'Please try again shortly, or install the Venpadi app and verify your number there.';
+        }
         throw new Error(msg || 'Something went wrong. Please try again.');
       });
     }, function () {
